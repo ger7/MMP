@@ -6,92 +6,70 @@
 #include <iterator>
 #include "portaudiocpp/PortAudioCpp.hxx" // [1] from PortAudio library
 #include "AudioBuffer.h" // [2] from PortAudioRecPlay
-//#include "aubioutils.h"  // [4] from Aubio library
-//#include "parse_args.h" // [3] from Aubio library
-
-#include <aubio.h>
-
+#include "parse_args.h" // [3] from Aubio library
+#include "utils.h"  // [4] from Aubio library
+#include "aubio.h" // [5] from Aubio Library
 
 /* Above references [3],[4] are referring to "Aubio" (aubio 0.4.0) are from aubio.org/downloads */
-/* Above references [1],[2] to "PortAudioRecPlay" are found at http://keithv.com/software/portaudio/. This example program also uses code from the PortAudio Library found at http://portaudio.com */
-
-//Some constants from PortAudioRecPlay.cpp
-const double	SAMPLE_RATE			= 16000.0;
-const int		FRAMES_PER_BUFFER	= 64;
-const int		TABLE_SIZE			= 200;
+/* Above references [1],[2] to [1]"PortAudio Library" and [2]"PortAudioRecPlay". These are found at [1] www.portaudio.com and [2] http://keithv.com/software/portaudio/.*/
 
 
-//typedef float fvec_t;
-typedef unsigned int uint_t;
-typedef int (*mmp_get_data) (fvec_t * input, uint_t hop_size);
+
 
 // Create a object that is used to record, save to file and play the audio.
 AudioBuffer	objAudioBuffer((int) (SAMPLE_RATE * 60));
 
-extern "C" {
-void examples_common_init();
-float examples_common_process(mmp_get_data   getData);
-//void fvec_set_sample(fvec_t*, fvec_t, uint_t);
 
-}
 
-VECTOR_SHORT_ITER it; //Moved here to prevent compiler issues
-VECTOR_SHORT vec;     //as above
-bool set =false;
 
-/*This method converts the array of data taken from the PortAudioRecPlay program into data to be used by Aubio for pitch detection and recognition.
-  The data it is passed is the data that is recorded using the main method of this program after one presses enter a second a time after making a short
-recording of the sound that you want to analyse*/
-int convertArray(fvec_t * ibuf, uint_t hop_size)
+void convertArray(fvec_t * ibuf, uint_t hop_size)
 {
-    int hasData = 0;        //hasData dictates whether there is still data left in the array and will stop the program from iterating too many times/running too long
-    if(!set)
-    {
-        it = objAudioBuffer.getIterator();
-        vec = objAudioBuffer.getVectors();
-        set = true;
-    }
-
-    int count =0;
-
+    VECTOR_SHORT_ITER it = objAudioBuffer.getIterator();
+    VECTOR_SHORT vec = objAudioBuffer.getVectors();
     for(uint_t i=0;i<hop_size;i++)
     {
         float pitchdata = 0.0;
         if(it!=vec.end())
         {
-            pitchdata=(float)(*it)/10000.00; //converts data so that it can be used in arrays for pitch detection in aubio
+            pitchdata=(float)(*it)/10000.00;
             it++;
-            hasData=1;
-        }
-        else
-        {
-            hasData=0;
         }
 
-        //checking to make sure that when the end of the data is reached i.e. reads zeros in the array that it stops the do loop in the aubio pitch detection file
-        if(pitchdata==0)
-        {
-            count ++;
-        }
-        else
-        {
-            count=0;
-        }
-        if(count>=5)
-        {
-            hasData=0;
-        }
         fvec_set_sample(ibuf, pitchdata, i);
 
-
     }
-    return hasData;
+}
+
+//aubiopitch set up
+aubio_pitch_t *o;
+aubio_wavetable_t *wavetable;
+fvec_t *pitch;
+
+//aubiopitch methods
+void
+process_block(fvec_t * ibuf, fvec_t * obuf) {
+  fvec_zeros(obuf);
+  aubio_pitch_do (o, ibuf, pitch);
+  smpl_t freq = fvec_get_sample(pitch, 0);
+  aubio_wavetable_set_amp ( wavetable, aubio_level_lin (ibuf) );
+  aubio_wavetable_set_freq ( wavetable, freq );
+
+  if (mix_input)
+    aubio_wavetable_do (wavetable, ibuf, obuf);
+  else
+    aubio_wavetable_do (wavetable, obuf, obuf);
+}
+
+void
+process_print (void) {
+  smpl_t pitch_found = fvec_get_sample(pitch, 0);
+  outmsg("%f %f\n",(blocks)
+      *hop_size/(float)samplerate, pitch_found);
 }
 
 
 
-/*This main method runs the recorder for the sound using code from "PortAudioRecPlay" as referenced at the top of this document. It uses simple code to allow for
-recording through a chosen device and feeds the data into an input stream. This data is then passed to Aubio for pitch processing.*/
+
 int main(int argc, char* argv[])
 {
     char 	chWait;
@@ -130,6 +108,11 @@ int main(int argc, char* argv[])
         return 0;
     }
 
+
+    //		portaudio::Device inDevice = portaudio::Device(sys.defaultInputDevice());
+
+    //		portaudio::Device& inDevice 	= sys.deviceByIndex(iInputDevice);
+
     for (portaudio::System::DeviceIterator i = sys.devicesBegin(); i != sys.devicesEnd(); ++i)
     {
         strDetails = "";
@@ -162,9 +145,22 @@ int main(int argc, char* argv[])
 
     objAudioBuffer.ResetPlayback();
 
+    buffer_size = 2048;
 
-    //AUBIO PITCH PROCESSING -- gets the pitch of the above recorded sound
-    examples_common_init();
-    float standardPitch=examples_common_process((mmp_get_data)convertArray);
-    cout <<"The averaged pitch is: "<< standardPitch << endl;
+    char **argtemp;
+    examples_common_init(0, argtemp);
+
+    o = new_aubio_pitch (pitch_method, buffer_size, hop_size, samplerate);
+    if (pitch_tolerance != 0.)
+      aubio_pitch_set_tolerance (o, pitch_tolerance);
+    if (silence_threshold != -90.)
+      aubio_pitch_set_silence (o, silence_threshold);
+    if (pitch_unit != NULL)
+      aubio_pitch_set_unit (o, pitch_unit);
+
+    pitch = new_fvec (1);
+
+    wavetable = new_aubio_wavetable (samplerate, hop_size);
+    aubio_wavetable_play ( wavetable );
+    examples_common_process((aubio_process_func_t)process_block,process_print, (mmp_get_data)convertArray);
 }

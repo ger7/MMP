@@ -61,4 +61,4 @@ typedef int (*mmp_get_data) (fvec_t * input, uint_t hop_size);
 // functions defined in utils.c
 void examples_common_init ();
 void examples_common_del (void);
-void examples_common_process (mmp_get_data   getData);
+float examples_common_process (mmp_get_data   getData);

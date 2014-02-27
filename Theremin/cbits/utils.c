@@ -31,6 +31,9 @@
 //#include "jackio.h"
 #endif /* HAVE_JACK */
 
+
+float pitchTotal=0;
+int noOfPitches=0;
 int verbose = 0;
 int usejack = 0;
 // input / output
@@ -84,15 +87,15 @@ printbuff()
     printf ("\n");
 }
 
-//aubiopitch set up
+//aubiopitch set up (extra vectors needed for aubio as well as the wavetable
 aubio_pitch_t *o;
 aubio_wavetable_t *wavetable;
 fvec_t *pitch;
 
+//command line argument parsing and initialisation of vectors ibuf and obuf, as well as the wavetable used by aubio used in pitch detection
 void
 examples_common_init ()
 {
-
     buffer_size = 2048;
 
     ibuf = new_fvec (hop_size);
@@ -124,7 +127,9 @@ examples_common_del (void)
 
 
 
-//aubiopitch methods
+//aubiopitch methods (used by Aubio to garner pitch in Hz from data)
+
+//This method processes one "block" of audio data passed from the buffer to acquire a pitch for this specific block
 void
 process_block(fvec_t * ibuf, fvec_t * obuf) {
   fvec_zeros(obuf);
@@ -139,38 +144,34 @@ process_block(fvec_t * ibuf, fvec_t * obuf) {
     aubio_wavetable_do (wavetable, obuf, obuf);
 }
 
+//Prints the pitch, taken from the vector containing the pitch data
 void
 process_print (void)
 {
   smpl_t pitch_found = fvec_get_sample(pitch, 0);
   outmsg("%f %f\n",(blocks)
-      *hop_size/(float)samplerate, pitch_found);
+         *hop_size/(float)samplerate, pitch_found);
 }
 
 
+void standardisePitch()
+{
+   smpl_t pitch_found = fvec_get_sample(pitch, 0);
+    if (pitch_found>0 && pitch_found<20)
+    {
+        pitchTotal+=pitch_found;
+        noOfPitches++;
+    }
+
+}
 
 
-
-
-void
-examples_common_process ( mmp_get_data   getData)
+//Method used primarily for processing the data to get a pitch in Hz
+float examples_common_process ( mmp_get_data   getData)
 {
 
   uint_t read = hop_size;
-  if (usejack) {
 
-#if HAVE_JACK
-    debug ("Jack activation ...\n");
-    aubio_jack_activate (jack_setup, process_func);
-    debug ("Processing (Ctrl+C to quit) ...\n");
-    pause ();
-    aubio_jack_close (jack_setup);
-#else
-    //usage (stderr, 1);
-    outmsg ("Compiled without jack output, exiting.\n");
-#endif
-
-  } else {
     /* phasevoc */
     blocks = 0;
     uint_t total_read = 0;
@@ -182,16 +183,15 @@ examples_common_process ( mmp_get_data   getData)
         {
             read = 0;
         }
-        else
-        {
-            printf("hasData:%i\n",hasData);
-        }
-      //aubio_source_do (this_source, ibuf, &read);   //TODO replace source here with input from Portaudiorec
+      //aubio_source_do (this_source, ibuf, &read);
       //printf("Pre process: ");                      //CLEANUP REQUIRED FOR PRINT STATEMENTS CTRL-F printbuff()
       //printbuff();
       process_block (ibuf, obuf);
-      printf("Post process: ");
-      printbuff();
+
+        standardisePitch();
+
+      //printf("Post process: ");                     //these print lines have been commented out but not removed due to testing purposes
+      //printbuff();
       // print to console if verbose or no output given
       if (verbose || sink_uri == NULL) {
         process_print();
@@ -209,9 +209,14 @@ examples_common_process ( mmp_get_data   getData)
 
     del_aubio_source (this_source);
     del_aubio_sink   (this_sink);
+    float pitchAverage=pitchTotal/noOfPitches;
+    noOfPitches=0;
+    pitchTotal=0;
+    return pitchAverage;
 
   }
-}
+
+
 
 void
 send_noteon (int pitch, int velo)
