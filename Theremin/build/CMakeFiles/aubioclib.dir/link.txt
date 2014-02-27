@@ -1,0 +1,2 @@
+/usr/bin/ar cr libaubioclib.a  CMakeFiles/aubioclib.dir/src/utils.c.o
+/usr/bin/ranlib libaubioclib.a
