@@ -18,7 +18,7 @@
 //Some constants from PortAudioRecPlay.cpp
 const double	SAMPLE_RATE			= 16000.0;
 const int		FRAMES_PER_BUFFER	= 64;
-const int		TABLE_SIZE			= 200;
+//const int		TABLE_SIZE			= 200;
 
 
 //typedef float fvec_t;

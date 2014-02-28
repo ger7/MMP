@@ -40,7 +40,7 @@ int usejack = 0;
 char_t *sink_uri = NULL;
 char_t *source_uri = NULL;
 // general stuff
-uint_t samplerate = 64;
+uint_t samplerate = 16000;
 uint_t buffer_size = 512;
 uint_t hop_size = 256;
 // onset stuff
@@ -157,7 +157,7 @@ process_print (void)
 void standardisePitch()
 {
    smpl_t pitch_found = fvec_get_sample(pitch, 0);
-    if (pitch_found>0 && pitch_found<20)
+    if (pitch_found>0 && pitch_found<3500)
     {
         pitchTotal+=pitch_found;
         noOfPitches++;

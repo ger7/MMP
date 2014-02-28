@@ -7,8 +7,10 @@ http://jackaudio.org/linux_rt_config --configuration of realtime setting for JAC
 http://askubuntu.com/questions/123798/how-to-hear-my-voice-in-speakers-with-a-mic --answer for acquiring realtime sound and processing it
 http://keithv.com/software/portaudio/ -- "PortAudioRecPlay" C++ code based recording to a file
 http://portaudio.com --library for PortAudioRecPlay
-https://github.com/ger7/MMP.git
-
+https://github.com/ger7/MMP.git -- Github address
+http://www.phys.unsw.edu.au/jw/notes.html --"Note names, MIDI numbers and frequencies" - A short write up on midi/frequency/note conversions
+http://iub.edu/~emusic/etext/synthesis/chapter4_pv.shtml -- "Introduction to Computer Music: Volume One: Chapter Four Synthesis" - Notes on sample rate and hope size
+http://www.wikihow.com/Calculate-Outliers -- "How to calculate outliers" - self explanatory title 
 
 TODO
 
@@ -16,13 +18,13 @@ Tried to use jack with aubio to be able to discern a pithc in real time
 
 Ended up trying to configure ALSA to work with JACK, also trying to configure JACK - with little success
 
-Divide values given from PortAudioRecPlay by 10,000 and read them in in blocks of 8 when processing the sound using aubio. Divide by 10,000 because values given in the array of floats that aubio uses are between -1 and 1. 
+Divide values given from PortAudioRecPlay by 10,000 and read them in in blocks of 8 when processing the sound using aubio. Divide by 10,000 because values given in the array of floats that aubio uses are between -1 and 1. --DONE
 
-Compile the program --make sure to check in parseargs
+Compile the program --make sure to check in parseargs --DONE
 
-Match degrees of robots arm movement to match a frequency change in Hz, starting with a change of 1 degree producing a change of "x"Hz
+Match degrees of robots arm movement to match a frequency change in Hz, starting with a change of 1 degree producing a change of "x"Hz TODO
 
-
+Improve pitch analysis and gaining a proper average of pitch in aubio in relation to Theremin speaker output. Could look into standard deviation. Maybe take the most repeated value and remove outliers from averaging i.e. ones that are radically different from the most repeated value/furthest away from the average?
 
 
 Cbits compilations:
@@ -31,4 +33,13 @@ gcc -shared -fPIC -o libCaubio.so utils.c -I../../aubio-0.4.0/src -L../../aubio-
 
 Shouldn't need to execute this line, but just in case:
 export LD_LIBRARY_PATH=/home/icub/Documents/MMP-George/Theremin/cbits:$LD_LIBRARY_PATH
+
+
+
+
+
+
+
+
+
 
