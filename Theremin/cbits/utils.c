@@ -27,6 +27,7 @@
 */
 
 #include "aubioutils.h"
+#include "simpleVector.h"
 #ifdef HAVE_JACK
 //#include "jackio.h"
 #endif /* HAVE_JACK */
@@ -34,6 +35,7 @@
 
 float pitchTotal=0;
 int noOfPitches=0;
+float pitchAverage=0;
 int verbose = 0;
 int usejack = 0;
 // input / output
@@ -87,15 +89,17 @@ printbuff()
     printf ("\n");
 }
 
-//aubiopitch set up (extra vectors needed for aubio as well as the wavetable
+//aubiopitch set up (extra vectors needed for aubio as well as the wavetable) - also vector for outlier removal
 aubio_pitch_t *o;
 aubio_wavetable_t *wavetable;
 fvec_t *pitch;
+vector v;
+
 
 //command line argument parsing and initialisation of vectors ibuf and obuf, as well as the wavetable used by aubio used in pitch detection
-void
-examples_common_init ()
+void examples_common_init ()
 {
+    vector_init(&v);
     buffer_size = 2048;
 
     ibuf = new_fvec (hop_size);
@@ -115,8 +119,7 @@ examples_common_init ()
     pitch = new_fvec (1);
 }
 
-void
-examples_common_del (void)
+void examples_common_del (void)
 {
   del_fvec (ibuf);
   del_fvec (obuf);
@@ -130,8 +133,7 @@ examples_common_del (void)
 //aubiopitch methods (used by Aubio to garner pitch in Hz from data)
 
 //This method processes one "block" of audio data passed from the buffer to acquire a pitch for this specific block
-void
-process_block(fvec_t * ibuf, fvec_t * obuf) {
+void process_block(fvec_t * ibuf, fvec_t * obuf) {
   fvec_zeros(obuf);
   aubio_pitch_do (o, ibuf, pitch);
   smpl_t freq = fvec_get_sample(pitch, 0);
@@ -145,28 +147,88 @@ process_block(fvec_t * ibuf, fvec_t * obuf) {
 }
 
 //Prints the pitch, taken from the vector containing the pitch data
-void
-process_print (void)
+void process_print (void)
 {
   smpl_t pitch_found = fvec_get_sample(pitch, 0);
   outmsg("%f %f\n",(blocks)
          *hop_size/(float)samplerate, pitch_found);
 }
 
-
+//Calculates an average, (maybe deprecated when outlier removal method is completed)
 void standardisePitch()
 {
-   smpl_t pitch_found = fvec_get_sample(pitch, 0);
-    if (pitch_found>0 && pitch_found<3500)
-    {
-        pitchTotal+=pitch_found;
-        noOfPitches++;
-    }
+  int i=0;
+  for(i=0; i<vector_count(&v); i++)
+  {
+      float *current=vector_get(&v, i);
+      pitchTotal+=*current;
+  }
+ pitchAverage=pitchTotal/vector_count(&v);
 
 }
 
+//Adds to the vector and sorts data using insertion sort to allow for proper averaging/outlier removal
+//TODO - find a good place to call this method, finish outlier removal method
+void populateAndSortVector()
+{
 
-//Method used primarily for processing the data to get a pitch in Hz
+    smpl_t pitch_found = fvec_get_sample(pitch, 0);
+    vector_add(&v, &pitch_found);
+
+    //check and sort from lowest to highest using insertion sort
+         int i, j;
+         float* index;
+         for (i = 1; i < vector_count(&v); ++i)
+         {
+              index = vector_get(&v, i);
+              for (j = i; j > 0; j--)
+              {
+                  float* nextValue=vector_get(&v, j-1);
+                  if(*nextValue > *index)
+                      vector_set(&v, j, nextValue);
+                  else break;
+              }
+
+              vector_set(&v, j, index);
+         }
+}
+
+//Method calculates the median, interquartile range, and also the inner and outer fences to determine whether data is an outlier or not.
+//Then it removes the outliers from the vector
+void removeOutliers()
+{
+    int i=0;
+    int middle=vector_count(&v)/2;  //index in vector
+   // float* centre = vector_get(&v, middle);
+   // float* offcentre = vector_get(&v, middle-1);
+   //float median=vector_count(&v) % 2 == 0 ? (*centre + *offcentre)/2 : *centre;
+    int Q1index = vector_count(&v) / 4;
+    int Q3index = Q1index + middle;
+    float* Q1ref = vector_get(&v, Q1index);
+    float* Q1offref = vector_get(&v, Q1index-1);
+    float* Q3ref = vector_get(&v, Q3index);
+    float* Q3offref = vector_get(&v, Q3index-1);
+    float Q1=vector_count(&v) % 2 == 0 ? (*Q1ref + *Q1offref )/2 : *Q1ref;
+    float Q3=vector_count(&v) % 2 == 0 ? (*Q3ref + *Q3offref)/2 : *Q3ref;
+   // float iqRangeInner=(Q3-Q1)*1.5;
+   // float innerFence1= Q1-iqRangeInner; //For mild outliers
+   // float innerFence2= Q3+iqRangeInner; //For mild outliers
+    float iqRangeOuter=(Q3-Q1)*3;
+    float outerFence1= Q1-iqRangeOuter; //For extreme outliers - likely to be used more than the innerfences
+    float outerFence2= Q3+iqRangeOuter; // ** as above
+    for(i=0; i<vector_count(&v); i++)
+    {
+        float* currentdata=vector_get(&v, i);
+        if(*currentdata>outerFence1 && *currentdata<outerFence2)
+        {
+        vector_delete(&v, i);
+        }
+
+    }
+}
+
+
+//Method used primarily for processing the data to get a pitch in Hz - currently calculates an average pitch
 float examples_common_process ( mmp_get_data   getData)
 {
 
@@ -188,7 +250,8 @@ float examples_common_process ( mmp_get_data   getData)
       //printbuff();
       process_block (ibuf, obuf);
 
-        standardisePitch();
+        populateAndSortVector();
+
 
       //printf("Post process: ");                     //these print lines have been commented out but not removed due to testing purposes
       //printbuff();
@@ -203,13 +266,15 @@ float examples_common_process ( mmp_get_data   getData)
       total_read += read;
     } while (read == hop_size);
 
+    removeOutliers();
+    standardisePitch();
+
     verbmsg ("read %.2fs (%d samples in %d blocks of %d) from %s at %dHz\n",
         total_read * 1. / samplerate,
         total_read, blocks, hop_size, source_uri, samplerate);
 
     del_aubio_source (this_source);
     del_aubio_sink   (this_sink);
-    float pitchAverage=pitchTotal/noOfPitches;
     noOfPitches=0;
     pitchTotal=0;
     return pitchAverage;

@@ -8,9 +8,11 @@ http://askubuntu.com/questions/123798/how-to-hear-my-voice-in-speakers-with-a-mi
 http://keithv.com/software/portaudio/ -- "PortAudioRecPlay" C++ code based recording to a file
 http://portaudio.com --library for PortAudioRecPlay
 https://github.com/ger7/MMP.git -- Github address
-http://www.phys.unsw.edu.au/jw/notes.html --"Note names, MIDI numbers and frequencies" - A short write up on midi/frequency/note conversions
-http://iub.edu/~emusic/etext/synthesis/chapter4_pv.shtml -- "Introduction to Computer Music: Volume One: Chapter Four Synthesis" - Notes on sample rate and hope size
-http://www.wikihow.com/Calculate-Outliers -- "How to calculate outliers" - self explanatory title 
+http://www.phys.unsw.edu.au/jw/notes.html --"Note names, MIDI numbers and frequencies" - A short write up on midi/frequency/note conversions, accessed on 28/02/2014
+http://iub.edu/~emusic/etext/synthesis/chapter4_pv.shtml -- "Introduction to Computer Music: Volume One: Chapter Four Synthesis" - Notes on sample rate and hope size, accessed on 28/02/2014
+http://www.wikihow.com/Calculate-Outliers -- "How to calculate outliers" - self explanatory title, accessed on 28/02/2014
+https://gist.github.com/EmilHernvall/953968 -- "Simple implementation of vector in C" - Emil Hernvall , accessed on 03/03/2014
+http://www.codebeach.com/2008/09/sorting-algorithms-in-c.html -- "sorting algorithms in C" - Article by Sig9 accessed on 03/03/2014 
 
 TODO
 
