@@ -10,8 +10,7 @@ SOURCES += \
     ../src/AudioBuffer.cpp \
     ../src/aubiopitch.c \
     ../src/ArmController.cpp \
-    ../cbits/utils.c \
-    ../cbits/simpleVector.c
+    ../cbits/utils.c
 
 OTHER_FILES +=
 
@@ -20,6 +19,5 @@ HEADERS += \
     ../include/parse_args.h \
     ../include/AudioBuffer.h \
     ../include/aubioutils.h \
-    ../include/ArmController.h \
-    ../cbits/simpleVector.h
+    ../include/ArmController.h
 

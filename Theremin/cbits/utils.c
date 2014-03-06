@@ -27,14 +27,18 @@
 */
 
 #include "aubioutils.h"
-#include "simpleVector.h"
 #ifdef HAVE_JACK
 //#include "jackio.h"
 #endif /* HAVE_JACK */
 
 
+#define  pitchArraySize 200
+float pitches[pitchArraySize];
+int pitchCount;
+int start=0;
+int end=0;
+
 float pitchTotal=0;
-int noOfPitches=0;
 float pitchAverage=0;
 int verbose = 0;
 int usejack = 0;
@@ -117,6 +121,9 @@ void examples_common_init ()
       aubio_pitch_set_unit (o, pitch_unit);
 
     pitch = new_fvec (1);
+
+
+
 }
 
 void examples_common_del (void)
@@ -154,81 +161,108 @@ void process_print (void)
          *hop_size/(float)samplerate, pitch_found);
 }
 
+
 //Calculates an average, (maybe deprecated when outlier removal method is completed)
 void standardisePitch()
 {
   int i=0;
-  for(i=0; i<vector_count(&v); i++)
+  int range=end-start;
+  for(i=start; i<end; i++)
   {
-      float *current=vector_get(&v, i);
-      pitchTotal+=*current;
+       float current=pitches[i];
+      //printf("Current vector value: %f at index %i", *current, i);
+      pitchTotal+=current;
+
+
   }
- pitchAverage=pitchTotal/vector_count(&v);
+ pitchAverage=pitchTotal/range;
+ printf("Pitch total is: %f \n", pitchTotal);
+
+
+// for(i=0; i<pitchCount; i++)
+// {
+//     printf("base array %i: %f\n", i, pitches[i]); debugging code
+// }
 
 }
 
 //Adds to the vector and sorts data using insertion sort to allow for proper averaging/outlier removal
 //TODO - find a good place to call this method, finish outlier removal method
-void populateAndSortVector()
+void populateAndSortArray()
 {
 
-    smpl_t pitch_found = fvec_get_sample(pitch, 0);
-    vector_add(&v, &pitch_found);
+    if(pitchCount<pitchArraySize)
+    {
+        pitches[pitchCount] = fvec_get_sample(pitch, 0);
+        pitchCount++;
+    }
+    else{
+        printf("Out of space in pitches array, need to expand it");
+    }
 
     //check and sort from lowest to highest using insertion sort
-         int i, j;
-         float* index;
-         for (i = 1; i < vector_count(&v); ++i)
+    int i, j;
+    float datum;
+    for (i = 1; i < pitchCount; ++i)
+    {
+        datum = pitches[i];
+         for (j = i; j > 0; j--)
          {
-              index = vector_get(&v, i);
-              for (j = i; j > 0; j--)
-              {
-                  float* nextValue=vector_get(&v, j-1);
-                  if(*nextValue > *index)
-                      vector_set(&v, j, nextValue);
-                  else break;
-              }
-
-              vector_set(&v, j, index);
+             float nextValue=pitches[j-1];
+             if(nextValue > datum)
+                 pitches[j]=nextValue;
+             else break;
          }
+
+         pitches[j]=datum;
+    }
+
 }
 
 //Method calculates the median, interquartile range, and also the inner and outer fences to determine whether data is an outlier or not.
-//Then it removes the outliers from the vector
-void removeOutliers()
+//Then it ignores outliers in the array
+void ignoreOutliers()
 {
     int i=0;
-    int middle=vector_count(&v)/2;  //index in vector
-   // float* centre = vector_get(&v, middle);
-   // float* offcentre = vector_get(&v, middle-1);
-   //float median=vector_count(&v) % 2 == 0 ? (*centre + *offcentre)/2 : *centre;
-    int Q1index = vector_count(&v) / 4;
+    int middle=pitchCount/2;  //index in vector
+   // float centre = vector_get(&v, middle);
+   // float offcentre = vector_get(&v, middle-1);
+   //float median=vector_count(&v) % 2 == 0 ? (centre + offcentre)/2 : centre;
+
+    int Q1index = pitchCount / 4;
     int Q3index = Q1index + middle;
-    float* Q1ref = vector_get(&v, Q1index);
-    float* Q1offref = vector_get(&v, Q1index-1);
-    float* Q3ref = vector_get(&v, Q3index);
-    float* Q3offref = vector_get(&v, Q3index-1);
-    float Q1=vector_count(&v) % 2 == 0 ? (*Q1ref + *Q1offref )/2 : *Q1ref;
-    float Q3=vector_count(&v) % 2 == 0 ? (*Q3ref + *Q3offref)/2 : *Q3ref;
+
+    float Q1ref = pitches[Q1index];
+    float Q1offref = pitches[Q1index-1];
+    float Q3ref = pitches[Q3index];
+    float Q3offref = pitches[Q3index-1];
+
+    float Q1=pitchCount % 2 == 0 ? (Q1ref + Q1offref )/2 : Q1ref;
+    float Q3=pitchCount % 2 == 0 ? (Q3ref + Q3offref)/2 : Q3ref;
+
    // float iqRangeInner=(Q3-Q1)*1.5;
    // float innerFence1= Q1-iqRangeInner; //For mild outliers
    // float innerFence2= Q3+iqRangeInner; //For mild outliers
+
     float iqRangeOuter=(Q3-Q1)*3;
     float outerFence1= Q1-iqRangeOuter; //For extreme outliers - likely to be used more than the innerfences
     float outerFence2= Q3+iqRangeOuter; // ** as above
-    for(i=0; i<vector_count(&v); i++)
-    {
-        float* currentdata=vector_get(&v, i);
-        if(*currentdata>outerFence1 && *currentdata<outerFence2)
-        {
-        vector_delete(&v, i);
-        }
 
+
+    while(pitches[i]<outerFence1)
+        i++;
+    while(pitches[i]==0)
+    {
+        i++;
     }
+    start = i;
+    while(pitches[i]<outerFence2)
+        i++;
+     end = i-1;
 }
 
 
-//Method used primarily for processing the data to get a pitch in Hz - currently calculates an average pitch
+//Method used primarily for processing the data to get a pitch in Hz - currently returns an average pitch
 float examples_common_process ( mmp_get_data   getData)
 {
 
@@ -250,7 +284,7 @@ float examples_common_process ( mmp_get_data   getData)
       //printbuff();
       process_block (ibuf, obuf);
 
-        populateAndSortVector();
+        populateAndSortArray();
 
 
       //printf("Post process: ");                     //these print lines have been commented out but not removed due to testing purposes
@@ -266,7 +300,7 @@ float examples_common_process ( mmp_get_data   getData)
       total_read += read;
     } while (read == hop_size);
 
-    removeOutliers();
+    ignoreOutliers();
     standardisePitch();
 
     verbmsg ("read %.2fs (%d samples in %d blocks of %d) from %s at %dHz\n",
@@ -275,7 +309,6 @@ float examples_common_process ( mmp_get_data   getData)
 
     del_aubio_source (this_source);
     del_aubio_sink   (this_sink);
-    noOfPitches=0;
     pitchTotal=0;
     return pitchAverage;
 
