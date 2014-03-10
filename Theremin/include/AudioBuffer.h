@@ -24,6 +24,7 @@ typedef vector<short>::iterator VECTOR_SHORT_ITER;
 class AudioBuffer
 {
 	public:
+        AudioBuffer(){}
 		AudioBuffer(int iSizeHint);
 		~AudioBuffer();
 		

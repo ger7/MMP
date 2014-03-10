@@ -1,6 +1,7 @@
 FILE(REMOVE_RECURSE
   "CMakeFiles/RealtimePitch.dir/src/RealtimePitch.cpp.o"
   "CMakeFiles/RealtimePitch.dir/src/AudioBuffer.cpp.o"
+  "CMakeFiles/RealtimePitch.dir/src/getpitch.cpp.o"
   "RealtimePitch.pdb"
   "RealtimePitch"
 )

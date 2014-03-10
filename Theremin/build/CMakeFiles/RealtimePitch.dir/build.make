@@ -95,16 +95,41 @@ CMakeFiles/RealtimePitch.dir/src/AudioBuffer.cpp.o.provides: CMakeFiles/Realtime
 
 CMakeFiles/RealtimePitch.dir/src/AudioBuffer.cpp.o.provides.build: CMakeFiles/RealtimePitch.dir/src/AudioBuffer.cpp.o
 
+CMakeFiles/RealtimePitch.dir/src/getpitch.cpp.o: CMakeFiles/RealtimePitch.dir/flags.make
+CMakeFiles/RealtimePitch.dir/src/getpitch.cpp.o: ../src/getpitch.cpp
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/icub/Documents/MMP-George/Theremin/build/CMakeFiles $(CMAKE_PROGRESS_3)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/RealtimePitch.dir/src/getpitch.cpp.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/RealtimePitch.dir/src/getpitch.cpp.o -c /home/icub/Documents/MMP-George/Theremin/src/getpitch.cpp
+
+CMakeFiles/RealtimePitch.dir/src/getpitch.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/RealtimePitch.dir/src/getpitch.cpp.i"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/icub/Documents/MMP-George/Theremin/src/getpitch.cpp > CMakeFiles/RealtimePitch.dir/src/getpitch.cpp.i
+
+CMakeFiles/RealtimePitch.dir/src/getpitch.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/RealtimePitch.dir/src/getpitch.cpp.s"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/icub/Documents/MMP-George/Theremin/src/getpitch.cpp -o CMakeFiles/RealtimePitch.dir/src/getpitch.cpp.s
+
+CMakeFiles/RealtimePitch.dir/src/getpitch.cpp.o.requires:
+.PHONY : CMakeFiles/RealtimePitch.dir/src/getpitch.cpp.o.requires
+
+CMakeFiles/RealtimePitch.dir/src/getpitch.cpp.o.provides: CMakeFiles/RealtimePitch.dir/src/getpitch.cpp.o.requires
+	$(MAKE) -f CMakeFiles/RealtimePitch.dir/build.make CMakeFiles/RealtimePitch.dir/src/getpitch.cpp.o.provides.build
+.PHONY : CMakeFiles/RealtimePitch.dir/src/getpitch.cpp.o.provides
+
+CMakeFiles/RealtimePitch.dir/src/getpitch.cpp.o.provides.build: CMakeFiles/RealtimePitch.dir/src/getpitch.cpp.o
+
 # Object files for target RealtimePitch
 RealtimePitch_OBJECTS = \
 "CMakeFiles/RealtimePitch.dir/src/RealtimePitch.cpp.o" \
-"CMakeFiles/RealtimePitch.dir/src/AudioBuffer.cpp.o"
+"CMakeFiles/RealtimePitch.dir/src/AudioBuffer.cpp.o" \
+"CMakeFiles/RealtimePitch.dir/src/getpitch.cpp.o"
 
 # External object files for target RealtimePitch
 RealtimePitch_EXTERNAL_OBJECTS =
 
 RealtimePitch: CMakeFiles/RealtimePitch.dir/src/RealtimePitch.cpp.o
 RealtimePitch: CMakeFiles/RealtimePitch.dir/src/AudioBuffer.cpp.o
+RealtimePitch: CMakeFiles/RealtimePitch.dir/src/getpitch.cpp.o
 RealtimePitch: CMakeFiles/RealtimePitch.dir/build.make
 RealtimePitch: CMakeFiles/RealtimePitch.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --red --bold "Linking CXX executable RealtimePitch"
@@ -116,6 +141,7 @@ CMakeFiles/RealtimePitch.dir/build: RealtimePitch
 
 CMakeFiles/RealtimePitch.dir/requires: CMakeFiles/RealtimePitch.dir/src/RealtimePitch.cpp.o.requires
 CMakeFiles/RealtimePitch.dir/requires: CMakeFiles/RealtimePitch.dir/src/AudioBuffer.cpp.o.requires
+CMakeFiles/RealtimePitch.dir/requires: CMakeFiles/RealtimePitch.dir/src/getpitch.cpp.o.requires
 .PHONY : CMakeFiles/RealtimePitch.dir/requires
 
 CMakeFiles/RealtimePitch.dir/clean:

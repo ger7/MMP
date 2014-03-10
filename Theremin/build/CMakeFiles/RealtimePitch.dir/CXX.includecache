@@ -360,7 +360,7 @@ fstream
 portaudiocpp/PortAudioCpp.hxx
 ../include/portaudiocpp/PortAudioCpp.hxx
 
-/home/icub/Documents/MMP-George/Theremin/src/RealtimePitch.cpp
+../include/getpitch.h
 iostream
 -
 cmath
@@ -371,12 +371,18 @@ cstddef
 -
 stdlib.h
 -
+unistd.h
+-
 iterator
 -
 portaudiocpp/PortAudioCpp.hxx
-/home/icub/Documents/MMP-George/Theremin/src/portaudiocpp/PortAudioCpp.hxx
+../include/portaudiocpp/PortAudioCpp.hxx
 AudioBuffer.h
-/home/icub/Documents/MMP-George/Theremin/src/AudioBuffer.h
+../include/AudioBuffer.h
 aubio.h
 -
+
+/home/icub/Documents/MMP-George/Theremin/src/getpitch.cpp
+getpitch.h
+/home/icub/Documents/MMP-George/Theremin/src/getpitch.h
 

@@ -99,24 +99,24 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named RealtimePitch
+# Target rules for targets named controller
 
 # Build rule for target.
-RealtimePitch: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 RealtimePitch
-.PHONY : RealtimePitch
+controller: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 controller
+.PHONY : controller
 
 # fast build rule for target.
-RealtimePitch/fast:
-	$(MAKE) -f CMakeFiles/RealtimePitch.dir/build.make CMakeFiles/RealtimePitch.dir/build
-.PHONY : RealtimePitch/fast
+controller/fast:
+	$(MAKE) -f CMakeFiles/controller.dir/build.make CMakeFiles/controller.dir/build
+.PHONY : controller/fast
 
 src/AudioBuffer.o: src/AudioBuffer.cpp.o
 .PHONY : src/AudioBuffer.o
 
 # target to build an object file
 src/AudioBuffer.cpp.o:
-	$(MAKE) -f CMakeFiles/RealtimePitch.dir/build.make CMakeFiles/RealtimePitch.dir/src/AudioBuffer.cpp.o
+	$(MAKE) -f CMakeFiles/controller.dir/build.make CMakeFiles/controller.dir/src/AudioBuffer.cpp.o
 .PHONY : src/AudioBuffer.cpp.o
 
 src/AudioBuffer.i: src/AudioBuffer.cpp.i
@@ -124,7 +124,7 @@ src/AudioBuffer.i: src/AudioBuffer.cpp.i
 
 # target to preprocess a source file
 src/AudioBuffer.cpp.i:
-	$(MAKE) -f CMakeFiles/RealtimePitch.dir/build.make CMakeFiles/RealtimePitch.dir/src/AudioBuffer.cpp.i
+	$(MAKE) -f CMakeFiles/controller.dir/build.make CMakeFiles/controller.dir/src/AudioBuffer.cpp.i
 .PHONY : src/AudioBuffer.cpp.i
 
 src/AudioBuffer.s: src/AudioBuffer.cpp.s
@@ -132,32 +132,56 @@ src/AudioBuffer.s: src/AudioBuffer.cpp.s
 
 # target to generate assembly for a file
 src/AudioBuffer.cpp.s:
-	$(MAKE) -f CMakeFiles/RealtimePitch.dir/build.make CMakeFiles/RealtimePitch.dir/src/AudioBuffer.cpp.s
+	$(MAKE) -f CMakeFiles/controller.dir/build.make CMakeFiles/controller.dir/src/AudioBuffer.cpp.s
 .PHONY : src/AudioBuffer.cpp.s
 
-src/RealtimePitch.o: src/RealtimePitch.cpp.o
-.PHONY : src/RealtimePitch.o
+src/controller.o: src/controller.cpp.o
+.PHONY : src/controller.o
 
 # target to build an object file
-src/RealtimePitch.cpp.o:
-	$(MAKE) -f CMakeFiles/RealtimePitch.dir/build.make CMakeFiles/RealtimePitch.dir/src/RealtimePitch.cpp.o
-.PHONY : src/RealtimePitch.cpp.o
+src/controller.cpp.o:
+	$(MAKE) -f CMakeFiles/controller.dir/build.make CMakeFiles/controller.dir/src/controller.cpp.o
+.PHONY : src/controller.cpp.o
 
-src/RealtimePitch.i: src/RealtimePitch.cpp.i
-.PHONY : src/RealtimePitch.i
+src/controller.i: src/controller.cpp.i
+.PHONY : src/controller.i
 
 # target to preprocess a source file
-src/RealtimePitch.cpp.i:
-	$(MAKE) -f CMakeFiles/RealtimePitch.dir/build.make CMakeFiles/RealtimePitch.dir/src/RealtimePitch.cpp.i
-.PHONY : src/RealtimePitch.cpp.i
+src/controller.cpp.i:
+	$(MAKE) -f CMakeFiles/controller.dir/build.make CMakeFiles/controller.dir/src/controller.cpp.i
+.PHONY : src/controller.cpp.i
 
-src/RealtimePitch.s: src/RealtimePitch.cpp.s
-.PHONY : src/RealtimePitch.s
+src/controller.s: src/controller.cpp.s
+.PHONY : src/controller.s
 
 # target to generate assembly for a file
-src/RealtimePitch.cpp.s:
-	$(MAKE) -f CMakeFiles/RealtimePitch.dir/build.make CMakeFiles/RealtimePitch.dir/src/RealtimePitch.cpp.s
-.PHONY : src/RealtimePitch.cpp.s
+src/controller.cpp.s:
+	$(MAKE) -f CMakeFiles/controller.dir/build.make CMakeFiles/controller.dir/src/controller.cpp.s
+.PHONY : src/controller.cpp.s
+
+src/getpitch.o: src/getpitch.cpp.o
+.PHONY : src/getpitch.o
+
+# target to build an object file
+src/getpitch.cpp.o:
+	$(MAKE) -f CMakeFiles/controller.dir/build.make CMakeFiles/controller.dir/src/getpitch.cpp.o
+.PHONY : src/getpitch.cpp.o
+
+src/getpitch.i: src/getpitch.cpp.i
+.PHONY : src/getpitch.i
+
+# target to preprocess a source file
+src/getpitch.cpp.i:
+	$(MAKE) -f CMakeFiles/controller.dir/build.make CMakeFiles/controller.dir/src/getpitch.cpp.i
+.PHONY : src/getpitch.cpp.i
+
+src/getpitch.s: src/getpitch.cpp.s
+.PHONY : src/getpitch.s
+
+# target to generate assembly for a file
+src/getpitch.cpp.s:
+	$(MAKE) -f CMakeFiles/controller.dir/build.make CMakeFiles/controller.dir/src/getpitch.cpp.s
+.PHONY : src/getpitch.cpp.s
 
 # Help Target
 help:
@@ -165,15 +189,18 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... RealtimePitch"
+	@echo "... controller"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... src/AudioBuffer.o"
 	@echo "... src/AudioBuffer.i"
 	@echo "... src/AudioBuffer.s"
-	@echo "... src/RealtimePitch.o"
-	@echo "... src/RealtimePitch.i"
-	@echo "... src/RealtimePitch.s"
+	@echo "... src/controller.o"
+	@echo "... src/controller.i"
+	@echo "... src/controller.s"
+	@echo "... src/getpitch.o"
+	@echo "... src/getpitch.i"
+	@echo "... src/getpitch.s"
 .PHONY : help
 
 

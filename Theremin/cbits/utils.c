@@ -97,13 +97,11 @@ printbuff()
 aubio_pitch_t *o;
 aubio_wavetable_t *wavetable;
 fvec_t *pitch;
-vector v;
 
 
 //command line argument parsing and initialisation of vectors ibuf and obuf, as well as the wavetable used by aubio used in pitch detection
 void examples_common_init ()
 {
-    vector_init(&v);
     buffer_size = 2048;
 
     ibuf = new_fvec (hop_size);
@@ -197,7 +195,7 @@ void populateAndSortArray()
         pitchCount++;
     }
     else{
-        printf("Out of space in pitches array, need to expand it");
+        printf("Out of space in pitches array, need to expand it\n");
     }
 
     //check and sort from lowest to highest using insertion sort
@@ -291,7 +289,7 @@ float examples_common_process ( mmp_get_data   getData)
       //printbuff();
       // print to console if verbose or no output given
       if (verbose || sink_uri == NULL) {
-        process_print();
+        //process_print();  //removed to prevent overloaded print statements
       }
       if (this_sink) {
         aubio_sink_do (this_sink, obuf, hop_size);

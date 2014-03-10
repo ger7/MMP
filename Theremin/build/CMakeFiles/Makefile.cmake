@@ -42,5 +42,5 @@ SET(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 SET(CMAKE_DEPEND_INFO_FILES
-  "CMakeFiles/RealtimePitch.dir/DependInfo.cmake"
+  "CMakeFiles/controller.dir/DependInfo.cmake"
   )

@@ -6,6 +6,7 @@ SET(CMAKE_DEPENDS_LANGUAGES
 SET(CMAKE_DEPENDS_CHECK_CXX
   "/home/icub/Documents/MMP-George/Theremin/src/AudioBuffer.cpp" "/home/icub/Documents/MMP-George/Theremin/build/CMakeFiles/RealtimePitch.dir/src/AudioBuffer.cpp.o"
   "/home/icub/Documents/MMP-George/Theremin/src/RealtimePitch.cpp" "/home/icub/Documents/MMP-George/Theremin/build/CMakeFiles/RealtimePitch.dir/src/RealtimePitch.cpp.o"
+  "/home/icub/Documents/MMP-George/Theremin/src/getpitch.cpp" "/home/icub/Documents/MMP-George/Theremin/build/CMakeFiles/RealtimePitch.dir/src/getpitch.cpp.o"
   )
 SET(CMAKE_CXX_COMPILER_ID "GNU")
 

@@ -18,28 +18,22 @@ INCLUDE_DIRECTORIES(
 )
 LINK_DIRECTORIES(
 	${PROJECT_SOURCE_DIR}../aubio-0.4.0/build/src
+	${PROJECT_SOURCE_DIR}/cbits/
 )
-
-FILE(GLOB c_code
-	src/utils.c
-	include/aubioutils.h
-	include/parse_args.h
-)
-
-ADD_LIBRARY(aubioclib ${c_code})
-TARGET_LINK_LIBRARIES(aubioclib)
-
 
 FILE(GLOB folder_source 
 #	src/ArmController.cpp
 	
 	src/AudioBuffer.cpp
+	src/getpitch.cpp
 	
 )
 FILE(GLOB folder_header
 	include/ArmController.h
 	include/AudioBuffer.h
 	include/utilities.h
+	include/getpitch.h
+	
 )
 
 SOURCE_GROUP("Source Files" FILES ${folder_source})
@@ -47,7 +41,9 @@ SOURCE_GROUP("Header Files" FILES ${folder_header})
 
 
 #ADD_EXECUTABLE(main ${PROJECT_SOURCE_DIR}/src/main.cpp ${folder_header} ${folder_source})
+ADD_EXECUTABLE(controller ${PROJECT_SOURCE_DIR}/src/controller.cpp ${folder_header} ${folder_source})
 ADD_EXECUTABLE(RealtimePitch ${PROJECT_SOURCE_DIR}/src/RealtimePitch.cpp ${folder_header} ${folder_source})
 
 #TARGET_LINK_LIBRARIES(main ${YARP_LIBRARIES})
-TARGET_LINK_LIBRARIES(RealtimePitch  portaudiocpp pthread portaudio aubioclib aubio)
+TARGET_LINK_LIBRARIES(controller  portaudiocpp pthread portaudio Caubio aubio)
+TARGET_LINK_LIBRARIES(RealtimePitch  portaudiocpp pthread portaudio Caubio aubio)
