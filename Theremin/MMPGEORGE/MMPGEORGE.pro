@@ -11,7 +11,9 @@ SOURCES += \
     ../src/aubiopitch.c \
     ../src/ArmController.cpp \
     ../cbits/utils.c \
-    ../src/getpitch.cpp
+    ../src/getpitch.cpp \
+    ../src/notemap.cpp \
+    ../src/controller.cpp
 
 OTHER_FILES +=
 
@@ -22,5 +24,6 @@ HEADERS += \
     ../include/aubioutils.h \
     ../include/ArmController.h \
     ../include/getpitch.h \
-    ../include/controller.h
+    ../include/controller.h \
+    ../include/notemap.h
 

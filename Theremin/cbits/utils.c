@@ -98,6 +98,18 @@ aubio_pitch_t *o;
 aubio_wavetable_t *wavetable;
 fvec_t *pitch;
 
+//Zeros all of the Values in the Array-and also data regarding the average pitch
+void zeroPitches ()
+{
+    int i =0;
+    for(i=0; i<pitchArraySize; i++)
+    {
+        pitches[i]=0;
+    }
+    pitchTotal=0;
+    pitchAverage=0;
+    pitchCount=0;
+}
 
 //command line argument parsing and initialisation of vectors ibuf and obuf, as well as the wavetable used by aubio used in pitch detection
 void examples_common_init ()
@@ -119,10 +131,10 @@ void examples_common_init ()
       aubio_pitch_set_unit (o, pitch_unit);
 
     pitch = new_fvec (1);
-
-
+    zeroPitches();
 
 }
+
 
 void examples_common_del (void)
 {
@@ -223,9 +235,9 @@ void ignoreOutliers()
 {
     int i=0;
     int middle=pitchCount/2;  //index in vector
-   // float centre = vector_get(&v, middle);
-   // float offcentre = vector_get(&v, middle-1);
-   //float median=vector_count(&v) % 2 == 0 ? (centre + offcentre)/2 : centre;
+    float centre = pitches[middle];
+    float offcentre = pitches[middle-1];
+    float median=pitchCount % 2 == 0 ? (centre + offcentre)/2 : centre;
 
     int Q1index = pitchCount / 4;
     int Q3index = Q1index + middle;
@@ -238,25 +250,29 @@ void ignoreOutliers()
     float Q1=pitchCount % 2 == 0 ? (Q1ref + Q1offref )/2 : Q1ref;
     float Q3=pitchCount % 2 == 0 ? (Q3ref + Q3offref)/2 : Q3ref;
 
-   // float iqRangeInner=(Q3-Q1)*1.5;
-   // float innerFence1= Q1-iqRangeInner; //For mild outliers
-   // float innerFence2= Q3+iqRangeInner; //For mild outliers
+    float iqRangeInner=(Q3-Q1)*1.5;
+    float innerFence1= Q1-iqRangeInner; //For mild outliers
+    float innerFence2= Q3+iqRangeInner; //For mild outliers
 
-    float iqRangeOuter=(Q3-Q1)*3;
-    float outerFence1= Q1-iqRangeOuter; //For extreme outliers - likely to be used more than the innerfences
-    float outerFence2= Q3+iqRangeOuter; // ** as above
+    //float iqRangeOuter=(Q3-Q1)*3;
+   // float outerFence1= Q1-iqRangeOuter; //For extreme outliers - likely to be used more than the innerfences
+   //float outerFence2= Q3+iqRangeOuter; // ** as above
 
 
-    while(pitches[i]<outerFence1)
+    while(pitches[i]<innerFence1)
         i++;
     while(pitches[i]==0)
     {
         i++;
     }
     start = i;
-    while(pitches[i]<outerFence2)
+    while(pitches[i]<innerFence2)
         i++;
      end = i-1;
+
+     printf("The value for Q1 is: %f \n", Q1);
+     printf("The value for Q3 is: %f \n", Q3);
+     printf("The value for the median is: %f \n", median);
 }
 
 

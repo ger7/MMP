@@ -22,17 +22,14 @@ LINK_DIRECTORIES(
 )
 
 FILE(GLOB folder_source 
-#	src/ArmController.cpp
-	
+	src/ArmController.cpp
+	src/notemap.cpp
 	src/AudioBuffer.cpp
 	src/getpitch.cpp
 	
 )
 FILE(GLOB folder_header
-	include/ArmController.h
-	include/AudioBuffer.h
-	include/utilities.h
-	include/getpitch.h
+	include/*.h
 	
 )
 
@@ -45,5 +42,5 @@ ADD_EXECUTABLE(controller ${PROJECT_SOURCE_DIR}/src/controller.cpp ${folder_head
 #ADD_EXECUTABLE(RealtimePitch ${PROJECT_SOURCE_DIR}/src/RealtimePitch.cpp ${folder_header} ${folder_source})
 
 #TARGET_LINK_LIBRARIES(main ${YARP_LIBRARIES})
-TARGET_LINK_LIBRARIES(controller  portaudiocpp pthread portaudio Caubio aubio)
+TARGET_LINK_LIBRARIES(controller ${YARP_LIBRARIES}  portaudiocpp pthread portaudio Caubio aubio)
 #TARGET_LINK_LIBRARIES(RealtimePitch  portaudiocpp pthread portaudio Caubio aubio)

@@ -4,26 +4,36 @@
 GetPitch* myPitch;
 
 
+portaudio::AutoSystem autoSys;  //initialises system instance
+portaudio::System &sys = portaudio::System::instance();
+int 	iInputDevice = sys.defaultInputDevice().index();
+
+//cout << "Opening recording input stream on " << sys.deviceByIndex(iInputDevice).name() << endl;
+portaudio::DirectionSpecificStreamParameters inParamsRecord(sys.deviceByIndex(iInputDevice), 1, portaudio::INT16, false, sys.deviceByIndex(iInputDevice).defaultLowInputLatency(), NULL);
+portaudio::StreamParameters paramsRecord(inParamsRecord, portaudio::DirectionSpecificStreamParameters::null(), SAMPLE_RATE, FRAMES_PER_BUFFER, paClipOff);
+
+
+
 GetPitch::GetPitch()
 {
     set=false;
     objAudioBuffer = AudioBuffer((int) (SAMPLE_RATE * 60));
 
     myPitch = this;
+
+
+
+
+
 }
 
 
 
 float GetPitch::record(long millisec)
 {
-    int 	iInputDevice = -1;
-    portaudio::AutoSystem autoSys;  //initialises system instance
-    portaudio::System &sys = portaudio::System::instance();
-    iInputDevice	= sys.defaultInputDevice().index();
-
-    cout << "Opening recording input stream on " << sys.deviceByIndex(iInputDevice).name() << endl;
-    portaudio::DirectionSpecificStreamParameters inParamsRecord(sys.deviceByIndex(iInputDevice), 1, portaudio::INT16, false, sys.deviceByIndex(iInputDevice).defaultLowInputLatency(), NULL);
-    portaudio::StreamParameters paramsRecord(inParamsRecord, portaudio::DirectionSpecificStreamParameters::null(), SAMPLE_RATE, FRAMES_PER_BUFFER, paClipOff);
+    set = false;
+    objAudioBuffer.Clear();
+    objAudioBuffer.ResetPlayback();
     portaudio::MemFunCallbackStream<AudioBuffer> streamRecord(paramsRecord, objAudioBuffer, &AudioBuffer::RecordCallback);
 
     streamRecord.start();

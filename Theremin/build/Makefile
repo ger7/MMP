@@ -111,6 +111,30 @@ controller/fast:
 	$(MAKE) -f CMakeFiles/controller.dir/build.make CMakeFiles/controller.dir/build
 .PHONY : controller/fast
 
+src/ArmController.o: src/ArmController.cpp.o
+.PHONY : src/ArmController.o
+
+# target to build an object file
+src/ArmController.cpp.o:
+	$(MAKE) -f CMakeFiles/controller.dir/build.make CMakeFiles/controller.dir/src/ArmController.cpp.o
+.PHONY : src/ArmController.cpp.o
+
+src/ArmController.i: src/ArmController.cpp.i
+.PHONY : src/ArmController.i
+
+# target to preprocess a source file
+src/ArmController.cpp.i:
+	$(MAKE) -f CMakeFiles/controller.dir/build.make CMakeFiles/controller.dir/src/ArmController.cpp.i
+.PHONY : src/ArmController.cpp.i
+
+src/ArmController.s: src/ArmController.cpp.s
+.PHONY : src/ArmController.s
+
+# target to generate assembly for a file
+src/ArmController.cpp.s:
+	$(MAKE) -f CMakeFiles/controller.dir/build.make CMakeFiles/controller.dir/src/ArmController.cpp.s
+.PHONY : src/ArmController.cpp.s
+
 src/AudioBuffer.o: src/AudioBuffer.cpp.o
 .PHONY : src/AudioBuffer.o
 
@@ -183,6 +207,30 @@ src/getpitch.cpp.s:
 	$(MAKE) -f CMakeFiles/controller.dir/build.make CMakeFiles/controller.dir/src/getpitch.cpp.s
 .PHONY : src/getpitch.cpp.s
 
+src/notemap.o: src/notemap.cpp.o
+.PHONY : src/notemap.o
+
+# target to build an object file
+src/notemap.cpp.o:
+	$(MAKE) -f CMakeFiles/controller.dir/build.make CMakeFiles/controller.dir/src/notemap.cpp.o
+.PHONY : src/notemap.cpp.o
+
+src/notemap.i: src/notemap.cpp.i
+.PHONY : src/notemap.i
+
+# target to preprocess a source file
+src/notemap.cpp.i:
+	$(MAKE) -f CMakeFiles/controller.dir/build.make CMakeFiles/controller.dir/src/notemap.cpp.i
+.PHONY : src/notemap.cpp.i
+
+src/notemap.s: src/notemap.cpp.s
+.PHONY : src/notemap.s
+
+# target to generate assembly for a file
+src/notemap.cpp.s:
+	$(MAKE) -f CMakeFiles/controller.dir/build.make CMakeFiles/controller.dir/src/notemap.cpp.s
+.PHONY : src/notemap.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -192,6 +240,9 @@ help:
 	@echo "... controller"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... src/ArmController.o"
+	@echo "... src/ArmController.i"
+	@echo "... src/ArmController.s"
 	@echo "... src/AudioBuffer.o"
 	@echo "... src/AudioBuffer.i"
 	@echo "... src/AudioBuffer.s"
@@ -201,6 +252,9 @@ help:
 	@echo "... src/getpitch.o"
 	@echo "... src/getpitch.i"
 	@echo "... src/getpitch.s"
+	@echo "... src/notemap.o"
+	@echo "... src/notemap.i"
+	@echo "... src/notemap.s"
 .PHONY : help
 
 
