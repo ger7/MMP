@@ -180,11 +180,14 @@ void standardisePitch()
   for(i=start; i<end; i++)
   {
        float current=pitches[i];
-      //printf("Current vector value: %f at index %i", *current, i);
+      printf(" %f  ,", current);
       pitchTotal+=current;
 
 
   }
+  printf("The value of 'Start' is: %i \n", start);
+  printf("The value of 'End' is: %i \n", end);
+  printf("The value of 'Range (between start and end)' is: %i \n", range);
  pitchAverage=pitchTotal/range;
  printf("Pitch total is: %f \n", pitchTotal);
 
@@ -267,12 +270,17 @@ void ignoreOutliers()
     }
     start = i;
     while(pitches[i]<innerFence2)
+    {
+        if(pitches[i]==0)
+            break;
         i++;
+    }
      end = i-1;
 
      printf("The value for Q1 is: %f \n", Q1);
      printf("The value for Q3 is: %f \n", Q3);
      printf("The value for the median is: %f \n", median);
+     printf("Start: %i End: %i\n", start, end);
 }
 
 
