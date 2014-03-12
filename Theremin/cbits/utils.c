@@ -180,16 +180,16 @@ void standardisePitch()
   for(i=start; i<end; i++)
   {
        float current=pitches[i];
-      printf(" %f  ,", current);
+      //printf(" %f  ,", current);
       pitchTotal+=current;
 
 
   }
-  printf("The value of 'Start' is: %i \n", start);
-  printf("The value of 'End' is: %i \n", end);
-  printf("The value of 'Range (between start and end)' is: %i \n", range);
+  //printf("The value of 'Start' is: %i \n", start);
+ // printf("The value of 'End' is: %i \n", end);
+ // printf("The value of 'Range (between start and end)' is: %i \n", range);
  pitchAverage=pitchTotal/range;
- printf("Pitch total is: %f \n", pitchTotal);
+// printf("Pitch total is: %f \n", pitchTotal);
 
 
 // for(i=0; i<pitchCount; i++)
@@ -238,9 +238,9 @@ void ignoreOutliers()
 {
     int i=0;
     int middle=pitchCount/2;  //index in vector
-    float centre = pitches[middle];
-    float offcentre = pitches[middle-1];
-    float median=pitchCount % 2 == 0 ? (centre + offcentre)/2 : centre;
+  //  float centre = pitches[middle];
+  //  float offcentre = pitches[middle-1];
+  //  float median=pitchCount % 2 == 0 ? (centre + offcentre)/2 : centre;
 
     int Q1index = pitchCount / 4;
     int Q3index = Q1index + middle;
@@ -277,10 +277,10 @@ void ignoreOutliers()
     }
      end = i-1;
 
-     printf("The value for Q1 is: %f \n", Q1);
-     printf("The value for Q3 is: %f \n", Q3);
-     printf("The value for the median is: %f \n", median);
-     printf("Start: %i End: %i\n", start, end);
+    // printf("The value for Q1 is: %f \n", Q1);
+   //  printf("The value for Q3 is: %f \n", Q3);
+   //  printf("The value for the median is: %f \n", median);
+   //  printf("Start: %i End: %i\n", start, end);
 }
 
 

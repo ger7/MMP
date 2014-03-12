@@ -67,6 +67,22 @@ string Notemap::findNote(float f)
     }
     return theNote;
 }
+
+
+float Notemap::findFreq(string note)
+{
+    float frequency= 0;
+    for(int i=0; i<arraySize; i++)
+    {
+        if(note==notes[i])
+        {
+            frequency=freq[i];
+            break;
+        }
+    }
+    return frequency;
+}
+
 //TODO - better averaging for the above?
 
 //Always doubles every octave - perhaps halving the distance between the iCub's hand

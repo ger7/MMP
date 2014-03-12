@@ -9,6 +9,7 @@ class Notemap
 public:
     Notemap();
     std::string findNote(float f);
+    float findFreq(std::string note);
 };
 
 #endif // NOTEMAP_H
