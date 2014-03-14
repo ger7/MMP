@@ -15,6 +15,13 @@ public:
     void moveArmOut();
     float findFreq(string note);
     float calculateOneDegreeChange();
+    void makeCalculatedMove(float prop);
+    float calculateRelativeMove(float startFrequency, float targetFrequency);
+    void playxFiles();
+    void playArpeggio();
+    string findSemitones(string note, int semitones);
+    void volumeUp();
+    void volumeDown();
 
 private:
     Notemap *notes;

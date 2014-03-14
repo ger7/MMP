@@ -15,6 +15,7 @@ using namespace yarp::dev;
 
 ArmController::ArmController(string rbt)
 {
+
 	robot = rbt;
 	bool success = initYarp();
 	if(!success)
@@ -87,9 +88,9 @@ bool ArmController::adjustJoint(bool rightArm, double change, int joint)
 	double adjPos = position += change;
 
 	if(adjPos > maxJointRanges[joint])
-		adjPos = maxJointRanges[joint];
+        adjPos = maxJointRanges[joint]-1;
 	else if(adjPos < minJointRanges[joint])
-		adjPos = minJointRanges[joint];
+        adjPos = minJointRanges[joint]+1;
 
 	printf("Adjusting joint to position %.2f\n", adjPos);
 

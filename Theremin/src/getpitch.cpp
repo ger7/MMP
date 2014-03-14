@@ -21,10 +21,6 @@ GetPitch::GetPitch()
 
     myPitch = this;
 
-
-
-
-
 }
 
 
@@ -49,6 +45,7 @@ float GetPitch::record(long millisec)
 
     cout << "Processing data to calculate pitch" << endl;
     float standardPitch=examples_common_process((mmp_get_data)convertArray);
+    cout<<"Pitch average is: "<< standardPitch<< endl;
     return standardPitch;
 }
 

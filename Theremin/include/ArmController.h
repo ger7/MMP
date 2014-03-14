@@ -13,6 +13,7 @@
 	#define LEFT_ARM
 	#define RIGHT_ARM	//used to indicate functional arms
 
+
 #include <yarp/os/all.h>
 #include <yarp/dev/all.h>
 
@@ -36,11 +37,16 @@ const double ARM_VELOCITY[] = 	  { 12,  12,  12,  10,  10,  10,  10, 20, 40, 50,
 
 //Values for playing Theremin
 //								   	  0    1    2    3    4    5    6   7   8   9   10  11   12  13   14  15
-const double minJointRanges[] =    {-78,  20,   0,  40, -10,   0,   0, 35, 10, 50,   5,  0,   0,  0,   0,  0};
-const double maxJointRanges[] =    {-65,  45,   0,  50,  10,   0,   0, 35, 10, 50,   5,  5,   5,  5,   5,  5};
+const double minJointRanges[] =    {-35,  20, -23,  55, -19,   0,   0, 55, 12, 50,   5,  0,   0,  0,   0,  0};
+const double maxJointRanges[] =    {-40,  40, -23,  55, -19,   0,   0, 55, 12, 50,   5,  5,   5,  5,   5,  5};
+//const double minJointRanges[] =    {-78,  20,   0,  40, -10,   0,   0, 35, 10, 50,   5,  0,   0,  0,   0,  0};
+//const double maxJointRanges[] =    {-65,  45,   0,  50,  10,   0,   0, 35, 10, 50,   5,  5,   5,  5,   5,  5};
 
-const double HOME_LEFT[]	=	      {-68,  42,   0,  23, -10,   0,   0, 35, 10, 50,   5,  5,   5,  5,   5,  5};
-const double HOME_RIGHT[]	=	  {-76,  37,   0,  15,   0,   0,   0, 35, 10, 50,   5,  5,   5,  5,   5,  5};
+
+const double HOME_LEFT[]     	=	   {-37,  21, -23,  55, -19,   0,   0, 55, 12, 50,   5,  5,   5,  5,   5,  5};
+const double HOME_RIGHT[]     	=	   {-37,  21, -23,  55, -19,   0,   0, 55, 12, 50,   5,  5,   5,  5,   5,  5};
+//const double HOME_LEFT[]	=	   {-68,  42,   0,  23, -10,   0,   0, 35, 10, 50,   5,  5,   5,  5,   5,  5};
+//const double HOME_RIGHT[]	=	  {-76,  37,   0,  15,   0,   0,   0, 35, 10, 50,   5,  5,   5,  5,   5,  5};
 
 
 class ArmController{
