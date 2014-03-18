@@ -3,6 +3,7 @@
 #include "getpitch.h"
 #include "notemap.h"
 #include "ArmController.h"
+#include "math.h"
 
 class controller
 {
@@ -22,6 +23,7 @@ public:
     string findSemitones(string note, int semitones);
     void volumeUp();
     void volumeDown();
+    void close();
 
 private:
     Notemap *notes;

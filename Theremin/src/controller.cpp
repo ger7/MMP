@@ -26,11 +26,12 @@ int main(int argc, char* argv[])
                "Press a to move right arm in by 1 degree and analyse sound" << endl <<
                "Press z to move right arm out by 1 degree and analyse sound"<< endl <<
                "Press f to adjust icubs arms to reach a particular frequency"<< endl <<
-               "Press g to calculate a change of pitch to one degree of movement"<< endl<<
-               "Press t to calculate a relative movement in degrees"<< endl<<
-               "Press p to play arpeggio"<<endl<<
+               "Press g to make a relative movement based on a recording from the theremin and a recording of a target pitch to reach"<< endl<<
+               "Press t to calculate a change in pitch and make a movement based on a note you want to enter"<< endl<<
+               "Press p to attempt to play an arpeggio"<<endl<<
                "Press + to increase volume (moves left hand in)"<<endl<<
-               "Press - to decrease volume (moves hand out)"<<endl<<
+               "Press - to decrease volume (moves left hand out)"<<endl<<
+               "Press x to attempt to play xfiles (much hilarity will ensue)"<<endl<<
                "Press e to exit"<< endl;
 
         cin >>chWait;
@@ -79,14 +80,26 @@ int main(int argc, char* argv[])
         }
         case 'g':
         {
-            control->calculateOneDegreeChange();
+            cout <<"Making initial recording of Theremin"<< endl;
+            float startFreq=control->record(500);
+            cout <<"The averaged pitch is: "<< startFreq << endl;
+            cout <<"Making second recording in 5 seconds (record the pitch you want to reach)"<< endl;
+            usleep(5000000);
+            float targetFreq=control->record(500);
+            cout <<"The pitch to reach is: "<< targetFreq << endl;
+            float result=control->calculateRelativeMove(startFreq, targetFreq);
+            cout <<"The amount of degrees to move is: "<< result << endl;
+            control->makeCalculatedMove(result);
             break;
+
         }
         case 't':
         {
             cout<<"Making initial recording"<<endl;
             float startFreq=control->record(500);
             cout <<"The averaged pitch is: "<< startFreq << endl;
+            theNote=control->findNote(startFreq);
+            cout <<"The note was roughly: "<< theNote<< endl;
             cout<<"Enter a note you want to reach: "<< endl;
             string input;
             cin>>input;
@@ -98,14 +111,20 @@ int main(int argc, char* argv[])
             }
             cout<<"The frequency to reach is: "<< targetFreq << endl;
             float result =control->calculateRelativeMove(startFreq, targetFreq);
-            cout<< "The amount of degrees to move is: "<< result<<endl;
-            control->makeCalculatedMove(result);
+            cout<< "The amount of degrees to move is: "<< result <<endl;
+            //control->makeCalculatedMove(result);
             break;
+
         }
         case 'p':
         {
             cout<<"Playing Arpeggio"<<endl;
             control->playArpeggio();
+            break;
+        }
+        case 'x':
+        {
+            control->playxFiles();
             break;
         }
         case 'o':
@@ -146,6 +165,7 @@ int main(int argc, char* argv[])
         }
         case 'e':
             cout << "Exiting..." << endl;
+            control->close();
             break;
         default:
             cout << "Unrecognised input" << endl;
@@ -264,6 +284,11 @@ void controller::volumeUp()
     ac->adjustJoint(LEFT, -5.0);
 }
 
+void controller::close()
+{
+    ac->close();
+}
+
 //Returns a note thats however many semitones away from a "starting note" that the user chooses. Specified in Notemap class
 string controller::findSemitones(string note, int semitones)
 {
@@ -315,8 +340,9 @@ float controller::calculateOneDegreeChange()
 float controller::calculateRelativeMove(float startFrequency, float targetFrequency)
 {
     float diff=startFrequency-targetFrequency;
-    float prop=diff/((0.158*startFrequency)+16.920);
+    float prop=diff/(27.0193321126*exp(0.0013133528*startFrequency));
     return prop;
+    //float prop=diff/((0.158*startFrequency)+16.920);
 }
 
 //Makes a calculated move of the robots arm using the proportion calculated in the function above as a parameter.
@@ -344,14 +370,16 @@ void controller::playxFiles()
                    "C5", "B5", "A5", "G5", "A5", "E5",
                    "C5", "B5", "A5", "G5", "B5", "E5"};
 
-
-
-    for(int i=0; i<24; i++)
+    float startNote=record(300);
+    float endNote=findFreq(tune[1]);
+    float result =calculateRelativeMove(startNote, endNote);
+    makeCalculatedMove(result);
+    for(int i=1; i<24; i++)
     {
-        float startNote=record(500);
-        float  endNote=findFreq(tune[i]);
+        startNote=findFreq(tune[i-1]);
+        endNote=findFreq(tune[i]);
         float prop=calculateRelativeMove(startNote, endNote);
-        usleep(1000);
+        usleep(2000000);
         makeCalculatedMove(prop);
     }
 }
