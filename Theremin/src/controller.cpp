@@ -25,10 +25,11 @@ int main(int argc, char* argv[])
         cout<< "Press s to record a sound and analyse the Pitch"<< endl <<
                "Press a to move right arm in by 1 degree and analyse sound" << endl <<
                "Press z to move right arm out by 1 degree and analyse sound"<< endl <<
-               "Press f to adjust icubs arms to reach a particular frequency"<< endl <<
+               "Press f to adjust icubs arms to reach a particular frequency incrementally"<< endl <<
                "Press g to make a relative movement based on a recording from the theremin and a recording of a target pitch to reach"<< endl<<
                "Press t to calculate a change in pitch and make a movement based on a note you want to enter"<< endl<<
                "Press p to attempt to play an arpeggio"<<endl<<
+               "Press o to calculate the note that is x semitones (specified by user) away from either a recorded note or user specified note"<< endl<<
                "Press + to increase volume (moves left hand in)"<<endl<<
                "Press - to decrease volume (moves left hand out)"<<endl<<
                "Press x to attempt to play xfiles (much hilarity will ensue)"<<endl<<
@@ -80,17 +81,26 @@ int main(int argc, char* argv[])
         }
         case 'g':
         {
+            char input;
             cout <<"Making initial recording of Theremin"<< endl;
-            float startFreq=control->record(500);
+            float startFreq=control->record(300);
             cout <<"The averaged pitch is: "<< startFreq << endl;
-            cout <<"Making second recording in 5 seconds (record the pitch you want to reach)"<< endl;
-            usleep(5000000);
-            float targetFreq=control->record(500);
-            cout <<"The pitch to reach is: "<< targetFreq << endl;
-            float result=control->calculateRelativeMove(startFreq, targetFreq);
-            cout <<"The amount of degrees to move is: "<< result << endl;
-            control->makeCalculatedMove(result);
-            break;
+            cout <<"Making second recording when you press r (record the pitch you want to reach)"<< endl;
+            cin>>input;
+            if(input=='r')
+            {
+                float targetFreq=control->record(300);
+                cout <<"The pitch to reach is: "<< targetFreq << endl;
+                float result=control->calculateRelativeMove(startFreq, targetFreq);
+                cout <<"The amount of degrees to move is: "<< result << endl;
+                control->makeCalculatedMove(result);
+                break;
+            }
+            else
+            {
+                cout<< "input not recognised press r to record second recording"<<endl;
+                break;
+            }
 
         }
         case 't':
@@ -112,7 +122,7 @@ int main(int argc, char* argv[])
             cout<<"The frequency to reach is: "<< targetFreq << endl;
             float result =control->calculateRelativeMove(startFreq, targetFreq);
             cout<< "The amount of degrees to move is: "<< result <<endl;
-            //control->makeCalculatedMove(result);
+            control->makeCalculatedMove(result);
             break;
 
         }
@@ -367,36 +377,224 @@ void controller::playxFiles()
 {
     string tune[]={"A4", "E4", "D4", "E4", "G4", "E4",
                    "A4", "E4", "D4", "E4", "A5", "E4",
-                   "C5", "B5", "A5", "G5", "A5", "E5",
-                   "C5", "B5", "A5", "G5", "B5", "E5"};
+                   "C5", "B5", "A5", "G4", "A5", "E4",
+                   "C5", "B5", "A5", "G4", "B5", "E4"};
 
-    float startNote=record(300);
-    float endNote=findFreq(tune[1]);
-    float result =calculateRelativeMove(startNote, endNote);
+    float startHz=record(300);
+    string startNote=findNote(startHz);                     //A4
+    string endNote=findSemitones(startNote, 7);             //E4
+    float endHz=findFreq(endNote);
+    float result =calculateRelativeMove(startHz, endHz);
     makeCalculatedMove(result);
-    for(int i=1; i<24; i++)
-    {
-        startNote=findFreq(tune[i-1]);
-        endNote=findFreq(tune[i]);
-        float prop=calculateRelativeMove(startNote, endNote);
-        usleep(2000000);
-        makeCalculatedMove(prop);
-    }
+
+    startNote=endNote;
+    startHz=endHz;
+    endNote=findSemitones(startNote, -2);                   //D4
+    endHz=findFreq(endNote);
+    result=calculateRelativeMove(startHz, endHz);
+    makeCalculatedMove(result);
+
+    startNote=endNote;
+    startHz=endHz;
+    endNote=findSemitones(startNote, 2);                    //E4
+    endHz=findFreq(endNote);
+    result=calculateRelativeMove(startHz, endHz);
+    makeCalculatedMove(result);
+
+    startNote=endNote;
+    startHz=endHz;
+    endNote=findSemitones(startNote, 3);                    //G4
+    endHz=findFreq(endNote);
+    result=calculateRelativeMove(startHz, endHz);
+    makeCalculatedMove(result);
+
+    startNote=endNote;
+    startHz=endHz;
+    endNote=findSemitones(startNote, -3);                   //E4
+    endHz=findFreq(endNote);
+    result=calculateRelativeMove(startHz, endHz);
+    makeCalculatedMove(result);
+
+    usleep(3000000);
+
+    startNote=endNote;
+    startHz=endHz;
+    endNote=findSemitones(startNote, -7);                   //A4
+    endHz=findFreq(endNote);
+    result=calculateRelativeMove(startHz, endHz);
+    makeCalculatedMove(result);
+
+    startNote=endNote;
+    startHz=endHz;
+    endNote=findSemitones(startNote, 7);                    //E4
+    endHz=findFreq(endNote);
+    result=calculateRelativeMove(startHz, endHz);
+    makeCalculatedMove(result);
+
+    startNote=endNote;
+    startHz=endHz;
+    endNote=findSemitones(startNote, -2);                   //D4
+    endHz=findFreq(endNote);
+    result=calculateRelativeMove(startHz, endHz);
+    makeCalculatedMove(result);
+
+    startNote=endNote;
+    startHz=endHz;
+    endNote=findSemitones(startNote, 2);                    //E4
+    endHz=findFreq(endNote);
+    result=calculateRelativeMove(startHz, endHz);
+    makeCalculatedMove(result);
+
+    startNote=endNote;
+    startHz=endHz;
+    endNote=findSemitones(startNote, 5);                    //A5
+    endHz=findFreq(endNote);
+    result=calculateRelativeMove(startHz, endHz);
+    makeCalculatedMove(result);
+
+    startNote=endNote;
+    startHz=endHz;
+    endNote=findSemitones(startNote, -5);                   //E4
+    endHz=findFreq(endNote);
+    result=calculateRelativeMove(startHz, endHz);
+    makeCalculatedMove(result);
+
+    usleep(2000000);
+
+    startNote=endNote;
+    startHz=endHz;
+    endNote=findSemitones(startNote, 8);                    //C5
+    endHz=findFreq(endNote);
+    result=calculateRelativeMove(startHz, endHz);
+    makeCalculatedMove(result);
+
+    startNote=endNote;
+    startHz=endHz;
+    endNote=findSemitones(startNote, -1);                   //B5
+    endHz=findFreq(endNote);
+    result=calculateRelativeMove(startHz, endHz);
+    makeCalculatedMove(result);
+
+    startNote=endNote;
+    startHz=endHz;
+    endNote=findSemitones(startNote, -2);                   //A5
+    endHz=findFreq(endNote);
+    result=calculateRelativeMove(startHz, endHz);
+    makeCalculatedMove(result);
+
+    startNote=endNote;
+    startHz=endHz;
+    endNote=findSemitones(startNote, -2);                   //G4
+    endHz=findFreq(endNote);
+    result=calculateRelativeMove(startHz, endHz);
+    makeCalculatedMove(result);
+
+    startNote=endNote;
+    startHz=endHz;
+    endNote=findSemitones(startNote, 2);                    //A5
+    endHz=findFreq(endNote);
+    result=calculateRelativeMove(startHz, endHz);
+    makeCalculatedMove(result);
+
+    startNote=endNote;
+    startHz=endHz;
+    endNote=findSemitones(startNote, -5);                   //E4
+    endHz=findFreq(endNote);
+    result=calculateRelativeMove(startHz, endHz);
+    makeCalculatedMove(result);
+
+    usleep(2000000);
+
+    startNote=endNote;
+    startHz=endHz;
+    endNote=findSemitones(startNote, 8);                    //C5
+    endHz=findFreq(endNote);
+    result=calculateRelativeMove(startHz, endHz);
+    makeCalculatedMove(result);
+
+    startNote=endNote;
+    startHz=endHz;
+    endNote=findSemitones(startNote, -1);                   //B5
+    endHz=findFreq(endNote);
+    result=calculateRelativeMove(startHz, endHz);
+    makeCalculatedMove(result);
+
+    startNote=endNote;
+    startHz=endHz;
+    endNote=findSemitones(startNote, -2);                   //A5
+    endHz=findFreq(endNote);
+    result=calculateRelativeMove(startHz, endHz);
+    makeCalculatedMove(result);
+
+    startNote=endNote;
+    startHz=endHz;
+    endNote=findSemitones(startNote, -2);                   //G4
+    endHz=findFreq(endNote);
+    result=calculateRelativeMove(startHz, endHz);
+    makeCalculatedMove(result);
+
+    startNote=endNote;
+    startHz=endHz;
+    endNote=findSemitones(startNote, 4);                    //B5
+    endHz=findFreq(endNote);
+    result=calculateRelativeMove(startHz, endHz);
+    makeCalculatedMove(result);
+
+    startNote=endNote;
+    startHz=endHz;
+    endNote=findSemitones(startNote, -7);                   //E4
+    endHz=findFreq(endNote);
+    result=calculateRelativeMove(startHz, endHz);
+    makeCalculatedMove(result);
+
+    cout<<"Fin"<<endl;
+
 }
 
 //Self explanatory function name
 void controller::playArpeggio()
 {
-    string tune[]= {"C4", "F4", "B4"};
+    float startHz=record(300);
+    string startNote=findNote(startHz);
+    string  endNote=findSemitones(startNote, 4);
+    float endHz=findFreq(endNote);
+    float result=calculateRelativeMove(startHz, endHz);
+    makeCalculatedMove(result);
 
-    for(int i=0; i<3; i++)
-    {
-        float startNote=record(500);
-        float  endNote=findFreq(tune[i]);
-        float prop=calculateRelativeMove(startNote, endNote);
-        usleep(1000);
-        makeCalculatedMove(prop);
-    }
+    startNote=endNote;
+    startHz=endHz;
+    endNote=findSemitones(startNote, 3);
+    endHz=findFreq(endNote);
+    result=calculateRelativeMove(startHz, endHz);
+    makeCalculatedMove(result);
+
+    startNote=endNote;
+    startHz=endHz;
+    endNote=findSemitones(startNote, 6);
+    endHz=findFreq(endNote);
+    result=calculateRelativeMove(startHz, endHz);
+    makeCalculatedMove(result);
+
+    startNote=endNote;
+    startHz=endHz;
+    endNote=findSemitones(startNote, -6);
+    endHz=findFreq(endNote);
+    result=calculateRelativeMove(startHz, endHz);
+    makeCalculatedMove(result);
+
+    startNote=endNote;
+    startHz=endHz;
+    endNote=findSemitones(startNote, -3);
+    endHz=findFreq(endNote);
+    result=calculateRelativeMove(startHz, endHz);
+    makeCalculatedMove(result);
+
+    startNote=endNote;
+    startHz=endHz;
+    endNote=findSemitones(startNote, -4);
+    endHz=findFreq(endNote);
+    result=calculateRelativeMove(startHz, endHz);
+    makeCalculatedMove(result);
 }
 
 

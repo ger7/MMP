@@ -88,13 +88,13 @@ bool ArmController::adjustJoint(bool rightArm, double change, int joint)
 	double adjPos = position += change;
 
 	if(adjPos > maxJointRanges[joint])
-        adjPos = maxJointRanges[joint]-1;
+        adjPos = maxJointRanges[joint];
 	else if(adjPos < minJointRanges[joint])
-        adjPos = minJointRanges[joint]+1;
+        adjPos = minJointRanges[joint];
 
 	printf("Adjusting joint to position %.2f\n", adjPos);
 
-	if(adjPos < maxJointRanges[joint] && adjPos > minJointRanges[joint])
+    if(adjPos <= maxJointRanges[joint] && adjPos >= minJointRanges[joint])
 	{
 
 		if(rightArm)
