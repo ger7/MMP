@@ -10,10 +10,22 @@ controller::controller()
     pitch=new GetPitch();
 }
 
+controller::controller(bool hasYarp)
+{
+    armControlOn=hasYarp;
+    robot= "icub";
+    if(hasYarp)
+    {
+        ac = new ArmController(robot);
+    }
+    notes=new Notemap();
+    pitch=new GetPitch();
+
+}
+
 int main(int argc, char* argv[])
 {
-
-    controller *control=new controller();
+    controller *control=new controller(false);
     string theNote= " ";
     float output=0;
 
@@ -29,6 +41,7 @@ int main(int argc, char* argv[])
                "Press g to make a relative movement based on a recording from the theremin and a recording of a target pitch to reach"<< endl<<
                "Press t to calculate a change in pitch and make a movement based on a note you want to enter"<< endl<<
                "Press p to attempt to play an arpeggio"<<endl<<
+               "Press l to record the current frequency, then 1 second after record another and make a movement!"<<endl<<
                "Press o to calculate the note that is x semitones (specified by user) away from either a recorded note or user specified note"<< endl<<
                "Press + to increase volume (moves left hand in)"<<endl<<
                "Press - to decrease volume (moves left hand out)"<<endl<<
@@ -40,7 +53,7 @@ int main(int argc, char* argv[])
         {
         case 's':
         {
-            output=control->record(500);
+            output=control->record(300);
             cout <<"The averaged pitch is: "<< output << endl;
             theNote=control->findNote(output);
             cout<<"The note received was roughly a: "<< theNote << endl;
@@ -49,7 +62,7 @@ int main(int argc, char* argv[])
         case 'a':
         {
             control->moveArmIn();
-            output=control->record(500);
+            output=control->record(300);
             cout <<"The averaged pitch is: "<< output << endl;
             theNote=control->findNote(output);
             cout<<"The note received was roughly a: "<< theNote << endl;
@@ -58,7 +71,7 @@ int main(int argc, char* argv[])
         case 'z':
         {
             control->moveArmOut();
-            output=control->record(500);
+            output=control->record(300);
             cout <<"The averaged pitch is: "<< output << endl;
             theNote=control->findNote(output);
             cout<<"The note received was roughly a: "<< theNote << endl;
@@ -101,12 +114,13 @@ int main(int argc, char* argv[])
                 cout<< "input not recognised press r to record second recording"<<endl;
                 break;
             }
+            break;
 
         }
         case 't':
         {
             cout<<"Making initial recording"<<endl;
-            float startFreq=control->record(500);
+            float startFreq=control->record(300);
             cout <<"The averaged pitch is: "<< startFreq << endl;
             theNote=control->findNote(startFreq);
             cout <<"The note was roughly: "<< theNote<< endl;
@@ -125,6 +139,14 @@ int main(int argc, char* argv[])
             control->makeCalculatedMove(result);
             break;
 
+        }
+        case 'l':
+        {
+            cout<<"Making initial recording"<<endl;
+            vector <float> v=control->buildTune();
+            control->playTune(v);
+
+            break;
         }
         case 'p':
         {
@@ -148,7 +170,7 @@ int main(int argc, char* argv[])
             cin>>answer;
             if(answer!='y')
             {
-                output=control->record(500);
+                output=control->record(300);
                 note=control->findNote(output);
                 cout<<"Specify the amount of semitones away you want to go"<<endl;
                 cin>>semi;
@@ -266,6 +288,12 @@ float controller::findFreq(string note)
     return notes->findFreq(note);
 }
 
+//Find the number of semitones between two given notes
+int controller::findNumberOfSemitones(string note, string note2)
+{
+    return notes->findNumberOfSemitones(note, note2);
+}
+
 //Returns a note when given a particular frequency - actual  function in Notemap class
 string controller::findNote(float frequency)
 {
@@ -284,16 +312,19 @@ void controller::moveArmOut()
     ac->adjustJoint(RIGHT, 1.0);
 }
 
+//Moves left arm outwards, lowering the volume
 void controller::volumeDown()
 {
     ac->adjustJoint(LEFT, 5.0);
 }
 
+//Moves left arm inwards, raising the volume
 void controller::volumeUp()
 {
     ac->adjustJoint(LEFT, -5.0);
 }
 
+//Shuts down the icub safely
 void controller::close()
 {
     ac->close();
@@ -351,6 +382,7 @@ float controller::calculateRelativeMove(float startFrequency, float targetFreque
 {
     float diff=startFrequency-targetFrequency;
     float prop=diff/(27.0193321126*exp(0.0013133528*startFrequency));
+    cout<<"Movement of: "<<prop<<" needed"<<endl;
     return prop;
     //float prop=diff/((0.158*startFrequency)+16.920);
 }
@@ -371,6 +403,55 @@ void controller::makeCalculatedMove(float prop)
 
     ac->adjustJoint(RIGHT, prop);
 }
+
+//Builds a vector of notes of a recorded tune from keyboard
+vector <float> controller::buildTune()
+{
+   vector <float> tune; //to be moved?
+   tune.reserve(10); //to be moved?
+
+   float hz=111;
+
+   while(hz>110)
+   {
+    hz=pitch->record(300);
+    usleep(200000);
+    tune.push_back(hz);
+   }
+
+   return tune;
+}
+
+void controller::playTune(vector <float> tune)
+{
+    cout<<"Vector size is: "<<tune.size() <<endl;
+    for(int i=0; i<tune.size(); i++)
+    {
+        cout<<"Vector contents are: "<< tune.at(i)<<endl;
+        cout<<"Note for above frequency is: "<< findNote(tune.at(i))<< endl;
+        if(i!=tune.capacity())
+        {
+        float firstnote=tune[i];
+        float secondnote=tune[i+1];
+        float result=calculateRelativeMove(firstnote, secondnote);
+        }
+    }
+}
+
+
+
+
+//Takes in current frequency (recorded and passed to param), the records a second frequency and tries to move to match it
+void controller::playRecordedNote(float currentfrequency)
+{
+    currentfrequency=pitch->record(300);
+    cout<<"Making Second recording in one second"<<endl;
+    usleep(300000);
+    float endHz=pitch->record(200);
+    float result=calculateRelativeMove(currentfrequency, endHz);
+    //makeCalculatedMove(result);
+}
+
 
 //Self explanatory function name
 void controller::playxFiles()

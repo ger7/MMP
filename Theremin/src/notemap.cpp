@@ -100,6 +100,37 @@ string Notemap::findSemitones(string note, int semitones) //returns the note tha
     return result;
 }
 
+//Finds the number of semitones between two given notes
+int Notemap::findNumberOfSemitones(string note, string note2)
+{
+
+    int semitones;
+    int indexnote1;
+    int indexnote2;
+
+    for(int i=0; i<arraySize; i++)
+    {
+        if(note==notes[i])
+        {
+            indexnote1=i;
+            break;
+        }
+    }
+
+    for(int j=0; j<arraySize; j++)
+    {
+        if(note2==notes[j])
+        {
+            indexnote2=j;
+            break;
+        }
+    }
+
+    semitones=indexnote2-indexnote1;
+    return semitones;
+
+}
+
 //TODO - better averaging for the above?
 
 //Always doubles every octave - perhaps halving the distance between the iCub's hand

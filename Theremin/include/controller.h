@@ -4,11 +4,13 @@
 #include "notemap.h"
 #include "ArmController.h"
 #include "math.h"
+#include <vector>
 
 class controller
 {
 public:
     controller();
+    controller(bool hasYarp);
     void reachAFrequency(float frequency);
     float record(long millisec);
     string findNote(float frequency);
@@ -24,12 +26,17 @@ public:
     void volumeUp();
     void volumeDown();
     void close();
+    void playRecordedNote(float currentfrequency);
+    int findNumberOfSemitones(string note, string note2);
+    std::vector<float> buildTune();
+    void playTune(std::vector<float> tune);
 
 private:
     Notemap *notes;
     GetPitch *pitch;
     ArmController* ac;
     string robot;
+    bool armControlOn;
 };
 
 #endif // CONTROLLER_H
