@@ -41,7 +41,7 @@ class GetPitch
 {
 public:
     GetPitch();
-    float record(long millisec);
+    float record(long millisec, bool silent=true);
     /*This method converts the array of data taken from the PortAudioRecPlay program into data to be used by Aubio for pitch detection and recognition.
           The data it is passed is the data that is recorded using the main method of this program after one presses enter a second a time after making a short
         recording of the sound that you want to analyse*/

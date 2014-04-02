@@ -12,7 +12,7 @@ public:
     controller();
     controller(bool hasYarp);
     void reachAFrequency(float frequency);
-    float record(long millisec);
+    float record(long millisec, int repeats=16, bool silent=false);
     string findNote(float frequency);
     void moveArmIn();
     void moveArmOut();

@@ -25,7 +25,7 @@ GetPitch::GetPitch()
 
 
 
-float GetPitch::record(long millisec)
+float GetPitch::record(long millisec, bool silent)
 {
     set = false;
     objAudioBuffer.Clear();
@@ -33,19 +33,34 @@ float GetPitch::record(long millisec)
     portaudio::MemFunCallbackStream<AudioBuffer> streamRecord(paramsRecord, objAudioBuffer, &AudioBuffer::RecordCallback);
 
     streamRecord.start();
+    if(!silent)
+    {
     cout << "Starting to record" << endl;
+    }
     usleep(millisec*1000); //usleep sleeps for a value in microseconds, hence *1000
+    if(!silent)
+    {
     cout << endl << "Stopping recording" << endl;
+    }
     streamRecord.stop();
     objAudioBuffer.ResetPlayback();
 
     //AUBIO PITCH PROCESSING -- gets the pitch of the above recorded sound
+    if(!silent)
+    {
     cout << "Initalising Aubio" << endl;
+    }
     examples_common_init();
 
+    if(!silent)
+    {
     cout << "Processing data to calculate pitch" << endl;
+    }
     float standardPitch=examples_common_process((mmp_get_data)convertArray);
+    if(!silent)
+    {
     cout<<"Pitch average is: "<< standardPitch<< endl;
+    }
     return standardPitch;
 }
 

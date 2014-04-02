@@ -25,7 +25,7 @@ controller::controller(bool hasYarp)
 
 int main(int argc, char* argv[])
 {
-    controller *control=new controller(false);
+    controller *control=new controller(true);
     string theNote= " ";
     float output=0;
 
@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
         cin >>chWait;
         switch(chWait)
         {
-        case 's':
+        case 's': //records a sound and analyses its frequency
         {
             output=control->record(300);
             cout <<"The averaged pitch is: "<< output << endl;
@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
             cout<<"The note received was roughly a: "<< theNote << endl;
             break;
         }
-        case 'a':
+        case 'a': //moves the right arm in by 1 degree and analyses the frequency produced
         {
             control->moveArmIn();
             output=control->record(300);
@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
             cout<<"The note received was roughly a: "<< theNote << endl;
             break;
         }
-        case 'z':
+        case 'z': //moves the right arm out by one degree and analyses the frequency produced
         {
             control->moveArmOut();
             output=control->record(300);
@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
             cout<<"The note received was roughly a: "<< theNote << endl;
             break;
         }
-        case 'f':
+        case 'f': //incrementally reaches a note through 1 degree movements to get as close to the pitch required as it can
         {
             cout<<"Enter a note you want to reach: "<< endl;
             string input;
@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
             control->reachAFrequency(foundFreq);
             break;
         }
-        case 'g':
+        case 'g': //records a pitch, then records a pitch you wish to reach, then makes the calculated move necessary for the robot
         {
             char input;
             cout <<"Making initial recording of Theremin"<< endl;
@@ -117,7 +117,7 @@ int main(int argc, char* argv[])
             break;
 
         }
-        case 't':
+        case 't': //Specifies a starting frequency, then prompts user to enter a note to reach. After this, makes a calculation for the relative move needed and makes the move
         {
             cout<<"Making initial recording"<<endl;
             float startFreq=control->record(300);
@@ -140,21 +140,27 @@ int main(int argc, char* argv[])
             break;
 
         }
-        case 'l':
+        case 'l': //builds a tune then attempts to play tune based on recording
         {
-            cout<<"Making initial recording"<<endl;
+            cout<<"Making initial recording in 3 seconds"<<endl;
+            usleep(1000000);
+            cout<<"READY"<<endl;
+            usleep(1000000);
+            cout<<"SET"<<endl;
+            usleep(1000000);
+            cout<<"GO"<<endl;
             vector <float> v=control->buildTune();
             control->playTune(v);
 
             break;
         }
-        case 'p':
+        case 'p': //attempts to play an arpeggio
         {
             cout<<"Playing Arpeggio"<<endl;
             control->playArpeggio();
             break;
         }
-        case 'x':
+        case 'x': //attempts to play the X files theme tune
         {
             control->playxFiles();
             break;
@@ -208,19 +214,22 @@ int main(int argc, char* argv[])
 
 //Records a peice of data and returns its average pitch in Hz. Records for an amount of time specified in milliseconds. Actual function in getpitch class.
 //Edited to return an average of the averaged pitches for better accuracy. Also removes outliers from set of samples.
-float controller::record(long millisec)
+float controller::record(long millisec, int repeats, bool silent)
 {
     //populate array
     float megaAverage=0;
     float totalAverage=0;
-    float averages [16]={};
+    float* averages=new float [repeats];
     float datum;
     int j;
     usleep(1000*millisec);
-    for(int i=0; i<16; i++)
+    for(int i=0; i<repeats; i++)
     {
         averages [i]=pitch->record(millisec);
+        if(!silent)
+        {
         cout<<"Averages [i] is: "<< averages[i]<<endl;
+        }
         for (int k = 1; k <= i; ++k)
         {
             datum = averages[k];
@@ -236,22 +245,25 @@ float controller::record(long millisec)
 
 
     }
-    for(int h=0; h<16; h++)
+    for(int h=0; h<repeats; h++)
     {
+        if(!silent)
+        {
         cout<<"Array contents: "<< averages[h]<<endl;
+        }
     }
 
     //ignore outliers in array
     int outlierIndex = 0;
-    int middle=16/2;
-    int Q1index = 16 / 4;
+    int middle=repeats/2;
+    int Q1index = repeats / 4;
     int Q3index = Q1index + middle;
     float Q1ref = averages[Q1index];
     float Q1offref = averages[Q1index-1];
     float Q3ref = averages[Q3index];
     float Q3offref = averages[Q3index-1];
-    float Q1=16 % 2 == 0 ? (Q1ref + Q1offref)/2 : Q1ref;
-    float Q3=16 % 2 == 0 ? (Q3ref + Q3offref)/2 : Q3ref;
+    float Q1=repeats % 2 == 0 ? (Q1ref + Q1offref)/2 : Q1ref;
+    float Q3=repeats % 2 == 0 ? (Q3ref + Q3offref)/2 : Q3ref;
 
     float iqRangeInner=(Q3-Q1)*1.5;
     float innerFence1= Q1-iqRangeInner; //For mild outliers
@@ -324,7 +336,7 @@ void controller::volumeUp()
     ac->adjustJoint(LEFT, -5.0);
 }
 
-//Shuts down the icub safely
+//Shuts down the icub safely using predefined method from ArmController class
 void controller::close()
 {
     ac->close();
@@ -407,35 +419,40 @@ void controller::makeCalculatedMove(float prop)
 //Builds a vector of notes of a recorded tune from keyboard
 vector <float> controller::buildTune()
 {
-   vector <float> tune; //to be moved?
-   tune.reserve(10); //to be moved?
+    vector <float> tune; //to be moved?
+    tune.reserve(10); //to be moved?
 
-   float hz=111;
+    float hz=251;
 
-   while(hz>110)
-   {
-    hz=pitch->record(300);
-    usleep(200000);
-    tune.push_back(hz);
-   }
-
-   return tune;
-}
-
-void controller::playTune(vector <float> tune)
-{
-    cout<<"Vector size is: "<<tune.size() <<endl;
-    for(int i=0; i<tune.size(); i++)
+    while(hz>250)
     {
-        cout<<"Vector contents are: "<< tune.at(i)<<endl;
-        cout<<"Note for above frequency is: "<< findNote(tune.at(i))<< endl;
-        if(i!=tune.capacity())
+        cout<<"PLAY"<<endl;
+        hz=record(200, 5, true);
+        //usleep(200000);
+
+        if(hz>250)
         {
-        float firstnote=tune[i];
-        float secondnote=tune[i+1];
-        float result=calculateRelativeMove(firstnote, secondnote);
+        tune.push_back(hz);
         }
     }
+
+    return tune;
+}
+
+//Plays the vector of Notes that have been built
+void controller::playTune(vector <float> tune)
+{
+    cout<<"Vector size is: "<<tune.size() <<endl; //prints for testing
+    for(int i=1; i<tune.size(); i++)
+    {
+        cout<<"Vector contents are: "<< tune.at(i)<<endl;
+        cout<<"Note for above frequency is: "<< findNote(tune.at(i))<< endl; //more testing prints
+
+        float firstnote=tune[i-1];
+        float secondnote=tune[i];
+        float result=calculateRelativeMove(firstnote, secondnote);
+    }
+
 }
 
 
@@ -496,7 +513,7 @@ void controller::playxFiles()
     result=calculateRelativeMove(startHz, endHz);
     makeCalculatedMove(result);
 
-    usleep(3000000);
+    usleep(2000000);
 
     startNote=endNote;
     startHz=endHz;
