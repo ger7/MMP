@@ -96,14 +96,18 @@ int main(int argc, char* argv[])
         {
             char input;
             cout <<"Making initial recording of Theremin"<< endl;
-            float startFreq=control->record(300);
+            float startFreq=control->record(300, 3, true);
             cout <<"The averaged pitch is: "<< startFreq << endl;
+            string note=control->findNote(startFreq);
+            cout<<"The note for initial recording is: "<< note<< endl;
             cout <<"Making second recording when you press r (record the pitch you want to reach)"<< endl;
             cin>>input;
             if(input=='r')
             {
-                float targetFreq=control->record(300);
+                float targetFreq=control->record(300, 3, true);
                 cout <<"The pitch to reach is: "<< targetFreq << endl;
+                note=control->findNote(targetFreq);
+                cout<<"The note to reach is: "<< note <<endl;
                 float result=control->calculateRelativeMove(startFreq, targetFreq);
                 cout <<"The amount of degrees to move is: "<< result << endl;
                 control->makeCalculatedMove(result);
@@ -150,8 +154,17 @@ int main(int argc, char* argv[])
             usleep(1000000);
             cout<<"GO"<<endl;
             vector <float> v=control->buildTune();
+            cout<<"Move the microphone to the icub and press y to continue"<<endl;
+            char input;
+            cin>>input;
+            if(input=='y')
+            {
             control->playTune(v);
-
+            }
+            else
+            {
+            break;
+            }
             break;
         }
         case 'p': //attempts to play an arpeggio
@@ -393,10 +406,10 @@ float controller::calculateOneDegreeChange()
 float controller::calculateRelativeMove(float startFrequency, float targetFrequency)
 {
     float diff=startFrequency-targetFrequency;
-    float prop=diff/(27.0193321126*exp(0.0013133528*startFrequency));
+    float prop=diff/(28.4290165697 *exp(0.0013271426*startFrequency));
     cout<<"Movement of: "<<prop<<" needed"<<endl;
     return prop;
-    //float prop=diff/((0.158*startFrequency)+16.920);
+    //float prop=diff/(27.0193321126*exp(0.0013133528*startFrequency));
 }
 
 //Makes a calculated move of the robots arm using the proportion calculated in the function above as a parameter.
@@ -419,8 +432,8 @@ void controller::makeCalculatedMove(float prop)
 //Builds a vector of notes of a recorded tune from keyboard
 vector <float> controller::buildTune()
 {
-    vector <float> tune; //to be moved?
-    tune.reserve(10); //to be moved?
+    vector <float> tune;
+    tune.reserve(10);
 
     float hz=251;
 
@@ -443,14 +456,23 @@ vector <float> controller::buildTune()
 void controller::playTune(vector <float> tune)
 {
     cout<<"Vector size is: "<<tune.size() <<endl; //prints for testing
+    cout<<""<<endl;
+    cout<<"Move microphone to theremin speakers"<<endl;
+    usleep(2000000);
+    float firstnote=record(200, 5, true); //initial recording for first move from the icubs current position
+    float secondnote= tune.at(0);
+    float result=calculateRelativeMove(firstnote, secondnote);
+    makeCalculatedMove(result);
+
     for(int i=1; i<tune.size(); i++)
     {
         cout<<"Vector contents are: "<< tune.at(i)<<endl;
         cout<<"Note for above frequency is: "<< findNote(tune.at(i))<< endl; //more testing prints
 
-        float firstnote=tune[i-1];
-        float secondnote=tune[i];
-        float result=calculateRelativeMove(firstnote, secondnote);
+        firstnote=tune[i-1];
+        secondnote=tune[i];
+        result=calculateRelativeMove(firstnote, secondnote);
+        makeCalculatedMove(result);
     }
 
 }
@@ -479,39 +501,52 @@ void controller::playxFiles()
                    "C5", "B5", "A5", "G4", "B5", "E4"};
 
     float startHz=record(300);
-    string startNote=findNote(startHz);                     //A4
-    string endNote=findSemitones(startNote, 7);             //E4
+    string startNote=findNote(startHz);                     //starting note for theremin
+    string endNote="A4";                                    //A4
     float endHz=findFreq(endNote);
-    float result =calculateRelativeMove(startHz, endHz);
+    float result =calculateRelativeMove(startHz, endHz);    //Move to A4
     makeCalculatedMove(result);
+    cout<<startNote<<endl;
 
     startNote=endNote;
     startHz=endHz;
-    endNote=findSemitones(startNote, -2);                   //D4
+    endNote=findSemitones(startNote, 7);    //E5
     endHz=findFreq(endNote);
     result=calculateRelativeMove(startHz, endHz);
     makeCalculatedMove(result);
+    cout<<startNote<<endl;
 
     startNote=endNote;
     startHz=endHz;
-    endNote=findSemitones(startNote, 2);                    //E4
+    endNote=findSemitones(startNote, -2);                   //D5
     endHz=findFreq(endNote);
     result=calculateRelativeMove(startHz, endHz);
     makeCalculatedMove(result);
+    cout<<startNote<<endl;
 
     startNote=endNote;
     startHz=endHz;
-    endNote=findSemitones(startNote, 3);                    //G4
+    endNote=findSemitones(startNote, 2);                    //E5
     endHz=findFreq(endNote);
     result=calculateRelativeMove(startHz, endHz);
     makeCalculatedMove(result);
+    cout<<startNote<<endl;
 
     startNote=endNote;
     startHz=endHz;
-    endNote=findSemitones(startNote, -3);                   //E4
+    endNote=findSemitones(startNote, 3);                    //G5
     endHz=findFreq(endNote);
     result=calculateRelativeMove(startHz, endHz);
     makeCalculatedMove(result);
+    cout<<startNote<<endl;
+
+    startNote=endNote;
+    startHz=endHz;
+    endNote=findSemitones(startNote, -3);                   //E5
+    endHz=findFreq(endNote);
+    result=calculateRelativeMove(startHz, endHz);
+    makeCalculatedMove(result);
+    cout<<startNote<<endl;
 
     usleep(2000000);
 
@@ -521,20 +556,23 @@ void controller::playxFiles()
     endHz=findFreq(endNote);
     result=calculateRelativeMove(startHz, endHz);
     makeCalculatedMove(result);
+    cout<<startNote<<endl;
 
     startNote=endNote;
     startHz=endHz;
-    endNote=findSemitones(startNote, 7);                    //E4
+    endNote=findSemitones(startNote, 7);                    //E5
     endHz=findFreq(endNote);
     result=calculateRelativeMove(startHz, endHz);
     makeCalculatedMove(result);
+    cout<<startNote<<endl;
 
     startNote=endNote;
     startHz=endHz;
-    endNote=findSemitones(startNote, -2);                   //D4
+    endNote=findSemitones(startNote, -2);                   //D5
     endHz=findFreq(endNote);
     result=calculateRelativeMove(startHz, endHz);
     makeCalculatedMove(result);
+    cout<<startNote<<endl;
 
     startNote=endNote;
     startHz=endHz;
@@ -542,6 +580,7 @@ void controller::playxFiles()
     endHz=findFreq(endNote);
     result=calculateRelativeMove(startHz, endHz);
     makeCalculatedMove(result);
+    cout<<startNote<<endl;
 
     startNote=endNote;
     startHz=endHz;
@@ -549,6 +588,7 @@ void controller::playxFiles()
     endHz=findFreq(endNote);
     result=calculateRelativeMove(startHz, endHz);
     makeCalculatedMove(result);
+    cout<<startNote<<endl;
 
     startNote=endNote;
     startHz=endHz;
@@ -556,6 +596,7 @@ void controller::playxFiles()
     endHz=findFreq(endNote);
     result=calculateRelativeMove(startHz, endHz);
     makeCalculatedMove(result);
+    cout<<startNote<<endl;
 
     usleep(2000000);
 
@@ -565,6 +606,7 @@ void controller::playxFiles()
     endHz=findFreq(endNote);
     result=calculateRelativeMove(startHz, endHz);
     makeCalculatedMove(result);
+    cout<<startNote<<endl;
 
     startNote=endNote;
     startHz=endHz;
@@ -572,6 +614,7 @@ void controller::playxFiles()
     endHz=findFreq(endNote);
     result=calculateRelativeMove(startHz, endHz);
     makeCalculatedMove(result);
+    cout<<startNote<<endl;
 
     startNote=endNote;
     startHz=endHz;
@@ -579,6 +622,7 @@ void controller::playxFiles()
     endHz=findFreq(endNote);
     result=calculateRelativeMove(startHz, endHz);
     makeCalculatedMove(result);
+    cout<<startNote<<endl;
 
     startNote=endNote;
     startHz=endHz;
@@ -586,6 +630,7 @@ void controller::playxFiles()
     endHz=findFreq(endNote);
     result=calculateRelativeMove(startHz, endHz);
     makeCalculatedMove(result);
+    cout<<startNote<<endl;
 
     startNote=endNote;
     startHz=endHz;
@@ -593,6 +638,7 @@ void controller::playxFiles()
     endHz=findFreq(endNote);
     result=calculateRelativeMove(startHz, endHz);
     makeCalculatedMove(result);
+    cout<<startNote<<endl;
 
     startNote=endNote;
     startHz=endHz;
@@ -600,15 +646,17 @@ void controller::playxFiles()
     endHz=findFreq(endNote);
     result=calculateRelativeMove(startHz, endHz);
     makeCalculatedMove(result);
+    cout<<startNote<<endl;
 
     usleep(2000000);
 
     startNote=endNote;
     startHz=endHz;
-    endNote=findSemitones(startNote, 8);                    //C5
+    endNote=findSemitones(startNote, 8);                    //C6
     endHz=findFreq(endNote);
     result=calculateRelativeMove(startHz, endHz);
     makeCalculatedMove(result);
+    cout<<startNote<<endl;
 
     startNote=endNote;
     startHz=endHz;
@@ -616,6 +664,7 @@ void controller::playxFiles()
     endHz=findFreq(endNote);
     result=calculateRelativeMove(startHz, endHz);
     makeCalculatedMove(result);
+    cout<<startNote<<endl;
 
     startNote=endNote;
     startHz=endHz;
@@ -623,13 +672,15 @@ void controller::playxFiles()
     endHz=findFreq(endNote);
     result=calculateRelativeMove(startHz, endHz);
     makeCalculatedMove(result);
+    cout<<startNote<<endl;
 
     startNote=endNote;
     startHz=endHz;
-    endNote=findSemitones(startNote, -2);                   //G4
+    endNote=findSemitones(startNote, -2);                   //G5
     endHz=findFreq(endNote);
     result=calculateRelativeMove(startHz, endHz);
     makeCalculatedMove(result);
+    cout<<startNote<<endl;
 
     startNote=endNote;
     startHz=endHz;
@@ -637,13 +688,15 @@ void controller::playxFiles()
     endHz=findFreq(endNote);
     result=calculateRelativeMove(startHz, endHz);
     makeCalculatedMove(result);
+    cout<<startNote<<endl;
 
     startNote=endNote;
     startHz=endHz;
-    endNote=findSemitones(startNote, -7);                   //E4
+    endNote=findSemitones(startNote, -7);                   //E5
     endHz=findFreq(endNote);
     result=calculateRelativeMove(startHz, endHz);
     makeCalculatedMove(result);
+    cout<<startNote<<endl;
 
     cout<<"Fin"<<endl;
 
